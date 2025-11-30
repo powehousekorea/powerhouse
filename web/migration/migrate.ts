@@ -93,7 +93,7 @@ async function migrate() {
         }
 
         // 2. Process HTML to Portable Text
-        let body = []
+        let body: any[] = []
         if (post.html) {
             const html = post.html.replace(/__GHOST_URL__/g, 'https://jaewook.ghost.io')
             try {
