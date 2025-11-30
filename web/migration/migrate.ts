@@ -91,7 +91,7 @@ async function migrate() {
                 }
             }
         }
-
+// 배포 트리거용 주석
         // 2. Process HTML to Portable Text
         let body: any[] = []
         if (post.html) {
