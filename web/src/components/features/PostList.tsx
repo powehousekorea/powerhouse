@@ -54,7 +54,6 @@ export function PostList({ posts, categories }: PostListProps) {
                     onClick={() => setSelectedCategory("all")}
                     className={`px-4 py-2 text-sm rounded-full transition-colors ${selectedCategory === "all" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700"}`}
                 >
-                    전체
                 </button>
                 {categories.map(cat => (
                     <button

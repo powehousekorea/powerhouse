@@ -4,9 +4,19 @@ export function Header() {
     return (
         <header className="w-full py-4 px-6 md:px-12 lg:px-24 flex justify-between items-center bg-white border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-white/95">
 
-            {/* 로고 */}
-            <Link href="/" className="text-xl font-bold tracking-tight text-foreground hover:text-primary transition-colors">
-                IMPACT FOUNDER&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;Jung Jaewook
+            {/* 로고: md 크기 기준으로 텍스트 분리 및 제어 */}
+            <Link href="/" className="text-xl font-bold tracking-tight text-gray-900 hover:opacity-80 transition-opacity">
+                
+                {/* 1. 모바일 (기본값) 및 md 사이즈 미만에서만 보이는 텍스트 */}
+                <span className="md:hidden">
+                    IMPACT FOUNDER
+                </span>
+
+                {/* 2. 데스크톱 (md 사이즈 이상)에서만 보이는 텍스트 */}
+                <span className="hidden md:inline">
+                    IMPACT FOUNDER&nbsp;&nbsp;|&nbsp;&nbsp;Jung Jaewook 
+                </span>
+                
             </Link>
 
             {/* PC 메뉴: About을 가장 위로 올렸습니다 */}
