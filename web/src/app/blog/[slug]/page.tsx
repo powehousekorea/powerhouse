@@ -11,6 +11,57 @@ interface PageProps {
     params: Promise<{ slug: string }>;
 }
 
+// Portable Text components for proper styling
+const portableTextComponents = {
+    block: {
+        h1: ({ children }: any) => (
+            <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-primary">{children}</h1>
+        ),
+        h2: ({ children }: any) => (
+            <h2 className="text-2xl md:text-3xl font-bold mt-10 mb-4 text-primary">{children}</h2>
+        ),
+        h3: ({ children }: any) => (
+            <h3 className="text-xl md:text-2xl font-semibold mt-8 mb-3 text-primary">{children}</h3>
+        ),
+        h4: ({ children }: any) => (
+            <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 text-primary">{children}</h4>
+        ),
+        normal: ({ children }: any) => (
+            <p className="mb-5 leading-relaxed text-foreground whitespace-pre-wrap">{children}</p>
+        ),
+    },
+    marks: {
+        strong: ({ children }: any) => <strong className="font-bold text-primary">{children}</strong>,
+        em: ({ children }: any) => <em className="italic">{children}</em>,
+        link: ({ value, children }: any) => (
+            <a
+                href={value?.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:underline"
+            >
+                {children}
+            </a>
+        ),
+    },
+    list: {
+        bullet: ({ children }: any) => (
+            <ul className="list-disc list-inside mb-5 space-y-1 text-foreground">{children}</ul>
+        ),
+        number: ({ children }: any) => (
+            <ol className="list-decimal list-inside mb-5 space-y-1 text-foreground">{children}</ol>
+        ),
+    },
+    listItem: {
+        bullet: ({ children }: any) => (
+            <li className="mb-1">{children}</li>
+        ),
+        number: ({ children }: any) => (
+            <li className="mb-1">{children}</li>
+        ),
+    },
+}
+
 export default async function BlogPostPage({ params }: PageProps) {
     const { slug } = await params;
     const post = await client.fetch(POST_QUERY, { slug });
@@ -62,8 +113,8 @@ export default async function BlogPostPage({ params }: PageProps) {
             )}
 
             {/* Content */}
-            <div className="prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-a:text-blue-600 hover:prose-a:text-blue-500">
-                {post.body ? <PortableText value={post.body} /> : <p className="text-gray-500 italic">No content...</p>}
+            <div className="flex flex-col max-w-none">
+                {post.body ? <PortableText value={post.body} components={portableTextComponents} /> : <p className="text-gray-500 italic">No content...</p>}
             </div>
         </article>
     );

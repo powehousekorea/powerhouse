@@ -29,7 +29,7 @@ const portableTextComponents = {
             <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 text-primary">{children}</h4>
         ),
         normal: ({ children }: any) => (
-            <p className="mb-3 leading-relaxed text-secondary">{children}</p>
+            <p className="mb-5 leading-relaxed text-foreground whitespace-pre-wrap">{children}</p>
         ),
     },
     marks: {
@@ -48,10 +48,10 @@ const portableTextComponents = {
     },
     list: {
         bullet: ({ children }: any) => (
-            <ul className="list-disc list-inside mb-3 space-y-1 text-secondary">{children}</ul>
+            <ul className="list-disc list-inside mb-5 space-y-1 text-foreground">{children}</ul>
         ),
         number: ({ children }: any) => (
-            <ol className="list-decimal list-inside mb-3 space-y-1 text-secondary">{children}</ol>
+            <ol className="list-decimal list-inside mb-5 space-y-1 text-foreground">{children}</ol>
         ),
     },
     listItem: {
