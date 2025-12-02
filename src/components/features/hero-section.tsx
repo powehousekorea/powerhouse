@@ -1,9 +1,17 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 export function HeroSection() {
+    // 서버와 클라이언트의 초기 렌더 차이를 막기 위해
+    // 파티클(랜덤 위치 요소)은 클라이언트에서만 렌더링
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-4 py-20">
             {/* Background Image with Overlay */}
@@ -37,29 +45,31 @@ export function HeroSection() {
                 </motion.div>
             </div>
 
-            {/* Floating particles effect */}
-            <div className="absolute inset-0 -z-10 overflow-hidden">
-                {[...Array(20)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute w-2 h-2 rounded-full bg-primary/30"
-                        initial={{
-                            x: Math.random() * 100 + "%",
-                            y: Math.random() * 100 + "%",
-                            opacity: 0,
-                        }}
-                        animate={{
-                            y: [null, Math.random() * -100 - 50],
-                            opacity: [0, 1, 0],
-                        }}
-                        transition={{
-                            duration: Math.random() * 3 + 2,
-                            repeat: Infinity,
-                            delay: Math.random() * 2,
-                        }}
-                    />
-                ))}
-            </div>
+            {/* Floating particles effect - 클라이언트에서만 렌더링하여 hydration mismatch 방지 */}
+            {mounted && (
+                <div className="absolute inset-0 -z-10 overflow-hidden">
+                    {[...Array(20)].map((_, i) => (
+                        <motion.div
+                            key={i}
+                            className="absolute w-2 h-2 rounded-full bg-primary/30"
+                            initial={{
+                                x: Math.random() * 100 + "%",
+                                y: Math.random() * 100 + "%",
+                                opacity: 0,
+                            }}
+                            animate={{
+                                y: [null, Math.random() * -100 - 50],
+                                opacity: [0, 1, 0],
+                            }}
+                            transition={{
+                                duration: Math.random() * 3 + 2,
+                                repeat: Infinity,
+                                delay: Math.random() * 2,
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
         </section>
     );
 }

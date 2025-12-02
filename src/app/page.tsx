@@ -4,8 +4,7 @@ import { ACTIVITIES_QUERY, LATEST_NEWS_QUERY } from "@/sanity/lib/queries";
 import { PostCard } from "@/components/features/post-card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
+import type { Post } from "@/types/post";
 
 export const revalidate = 60;
 
@@ -15,8 +14,8 @@ export default async function Home() {
     client.fetch(LATEST_NEWS_QUERY),
   ]);
 
-  const latestActivities = activities.slice(0, 7);
-  const latestNews = news.slice(0, 3);
+  const latestActivities: Post[] = activities.slice(0, 7);
+  const latestNews: Post[] = news.slice(0, 3);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -72,7 +71,7 @@ export default async function Home() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            {latestActivities.map((post: any) => (
+            {latestActivities.map((post) => (
               <PostCard key={post._id} post={post} />
             ))}
           </div>
@@ -124,7 +123,7 @@ export default async function Home() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            {latestNews.map((post: any) => (
+            {latestNews.map((post) => (
               <PostCard key={post._id} post={post} />
             ))}
           </div>

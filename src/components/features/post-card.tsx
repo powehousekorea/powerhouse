@@ -1,19 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import type { Post } from "@/types/post";
 
 interface PostCardProps {
-    post: {
-        title: string;
-        slug: { current: string };
-        mainImage?: any;
-        publishedAt: string;
-        summary?: string;
-        categories?: string[];
-    };
+    post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {

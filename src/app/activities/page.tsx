@@ -1,11 +1,12 @@
 import { client } from "@/sanity/lib/client";
 import { ACTIVITIES_QUERY } from "@/sanity/lib/queries";
 import { PostCard } from "@/components/features/post-card";
+import type { Post } from "@/types/post";
 
 export const revalidate = 60;
 
 export default async function ActivitiesPage() {
-    const posts = await client.fetch(ACTIVITIES_QUERY);
+    const posts: Post[] = await client.fetch(ACTIVITIES_QUERY);
 
     return (
         <div className="container mx-auto px-4 py-16 max-w-6xl">
@@ -21,7 +22,7 @@ export default async function ActivitiesPage() {
 
             <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
                 {posts.length > 0 ? (
-                    posts.map((post: any) => (
+                    posts.map((post) => (
                         <PostCard key={post._id} post={post} />
                     ))
                 ) : (
