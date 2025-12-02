@@ -1,31 +1,32 @@
 import { client } from "@/sanity/lib/client";
-import { LINK_CARDS_QUERY } from "@/sanity/lib/queries";
-import { LinkPreviewCard } from "@/components/features/link-preview-card";
+import { ACTIVITIES_QUERY } from "@/sanity/lib/queries";
+import { PostCard } from "@/components/features/post-card";
 
 export const revalidate = 60;
 
 export default async function ActivitiesPage() {
-    const links = await client.fetch(LINK_CARDS_QUERY);
+    const posts = await client.fetch(ACTIVITIES_QUERY);
 
     return (
-        <div className="container mx-auto px-4 py-12">
-            <div className="mb-12 text-center">
-                <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-                    Archive
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
+            <div className="mb-20 text-center space-y-6">
+                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
+                    청연 활동 소식
                 </h1>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                    Powerhouse Korea가 주목하는 기사와 자료들을 모았습니다.
-                </p>
+                <div className="space-y-2 text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+                    <p>한국청년유권자연맹의 최근 소식!</p>
+                    <p>어떤 일이 있었을까요?</p>
+                </div>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {links.length > 0 ? (
-                    links.map((item: any) => (
-                        <LinkPreviewCard key={item._id} item={item} />
+            <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {posts.length > 0 ? (
+                    posts.map((post: any) => (
+                        <PostCard key={post._id} post={post} />
                     ))
                 ) : (
                     <div className="col-span-full text-center py-20 text-muted-foreground">
-                        아직 등록된 자료가 없습니다.
+                        아직 등록된 활동이 없습니다.
                     </div>
                 )}
             </div>

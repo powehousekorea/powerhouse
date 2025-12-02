@@ -13,7 +13,7 @@ export function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    <h1 className="mb-6 font-serif text-5xl font-bold tracking-tight text-foreground sm:text-7xl">
+                    <h1 className="mb-6 text-5xl font-bold tracking-tight text-foreground sm:text-7xl">
                         Powerhouse Korea
                     </h1>
                 </motion.div>

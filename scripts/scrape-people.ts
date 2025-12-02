@@ -1,59 +1,97 @@
-import axios from 'axios';
-import * as cheerio from 'cheerio';
+import puppeteer from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
 
 const BASE_URL = 'https://www.powerhousekorea.com';
 
 async function scrapePeople() {
-    console.log('Scraping People...');
-    const { data } = await axios.get(`${BASE_URL}/people`);
-    const $ = cheerio.load(data);
-    const people: any[] = [];
+    console.log('Scraping People with Puppeteer...');
 
-    // Adjust selector based on actual site structure (from previous analysis)
-    // Assuming a list or grid structure. I'll target common containers.
-    // Based on screenshot, it looks like a grid.
-    // I'll try to find images and names.
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1920, height: 1080 });
 
-    // Since I can't inspect the DOM interactively here, I'll use a generic approach 
-    // and might need to refine it if I had the HTML content.
-    // But I'll try to target elements that look like profile cards.
+    await page.goto(`${BASE_URL}/people`, { waitUntil: 'networkidle2' });
 
-    // Let's assume standard Imweb structure or generic divs.
-    // I'll look for images with alt text or adjacent text.
+    // Debug: Take a screenshot
+    await page.screenshot({ path: path.join(__dirname, 'debug_people.png') });
 
-    // Strategy: Find all images in the main content area.
-    $('img').each((i, el) => {
-        const src = $(el).attr('src');
-        const alt = $(el).attr('alt'); // Name often in alt
+    // Wait for text-table or similar
+    try {
+        await page.waitForSelector('.text-table', { timeout: 10000 });
+    } catch (e) {
+        console.log('No .text-table found (timeout)');
+    }
 
-        // Filter out small icons or layout images
-        if (src && !src.includes('logo') && !src.includes('icon')) {
-            // Try to find role or bio nearby
-            const container = $(el).closest('div');
-            const text = container.text().trim();
+    const people = await page.evaluate(() => {
+        const items: any[] = [];
+        // Each person is in a .col-dz div
+        const columns = document.querySelectorAll('.col-dz');
+        console.log(`Found ${columns.length} columns`);
 
-            if (text.length > 2 && text.length < 200) {
-                people.push({
-                    name: alt || 'Unknown',
-                    image: src,
-                    bio: text.replace(alt || '', '').trim(),
-                    role: 'Member' // Default role
+        columns.forEach((col) => {
+            // Find image
+            let image = '';
+            // Try multiple selectors
+            let imgWrap = col.querySelector('.img-wrap');
+            if (!imgWrap) {
+                imgWrap = col.querySelector('[style*="background-image"]');
+            }
+
+            if (imgWrap) {
+                const style = imgWrap.getAttribute('style') || '';
+                const match = style.match(/url\(["']?([^"')]+)["']?\)/);
+                if (match) {
+                    image = match[1];
+                    // Clean up URL
+                    image = image.replace(/&quot;/g, '').split('?')[0];
+                }
+            }
+
+            // Find text info
+            const textTable = col.querySelector('.text-table');
+            if (!textTable) return;
+
+            const paragraphs = textTable.querySelectorAll('p');
+            if (paragraphs.length === 0) return;
+
+            let name = '';
+            let role = '';
+            let bio = '';
+
+            // First paragraph is usually the name
+            if (paragraphs.length >= 1) {
+                name = paragraphs[0].textContent?.trim() || '';
+            }
+            // Second is role
+            if (paragraphs.length >= 2) {
+                role = paragraphs[1].textContent?.trim() || '';
+            }
+            // Third is bio
+            if (paragraphs.length >= 3) {
+                bio = paragraphs[2].textContent?.trim() || '';
+            }
+
+            // Filter out section headers and invalid entries
+            if (name && name.length < 50 && !name.includes('함께하는') && !name.includes('운영위원') && !name.includes('청연과')) {
+                items.push({
+                    name,
+                    role,
+                    bio,
+                    image,
+                    _type: 'person'
                 });
             }
-        }
+        });
+
+        return items;
     });
 
-    // Deduplicate and clean
-    const uniquePeople = people.filter((p, index, self) =>
-        index === self.findIndex((t) => (
-            t.image === p.image
-        ))
-    );
+    await browser.close();
 
-    console.log(`Found ${uniquePeople.length} people.`);
-    fs.writeFileSync(path.join(__dirname, 'people_data.json'), JSON.stringify(uniquePeople, null, 2));
+    console.log(`Found ${people.length} people.`);
+    fs.writeFileSync(path.join(__dirname, 'people_data.json'), JSON.stringify(people, null, 2));
+    return people;
 }
 
 scrapePeople();

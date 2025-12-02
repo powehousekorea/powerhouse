@@ -34,7 +34,7 @@ export default async function PostPage({ params }: PageProps) {
                         {format(new Date(post.publishedAt), "PPP", { locale: ko })}
                     </time>
                 </div>
-                <h1 className="font-serif text-3xl font-bold tracking-tight sm:text-5xl mb-6 leading-tight">
+                <h1 className="text-3xl font-bold tracking-tight sm:text-5xl mb-6 leading-tight">
                     {post.title}
                 </h1>
                 {post.summary && (

@@ -1,24 +1,25 @@
 import { client } from "@/sanity/lib/client";
-import { POSTS_QUERY } from "@/sanity/lib/queries";
+import { NEWS_QUERY } from "@/sanity/lib/queries";
 import { PostCard } from "@/components/features/post-card";
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function NewsPage() {
-    const posts = await client.fetch(POSTS_QUERY);
+    const posts = await client.fetch(NEWS_QUERY);
 
     return (
-        <div className="container mx-auto px-4 py-12">
-            <div className="mb-12 text-center">
-                <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-                    News & Activities
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
+            <div className="mb-20 text-center space-y-6">
+                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
+                    청연 NEWS
                 </h1>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                    Powerhouse Korea의 최신 소식과 활동을 전해드립니다.
-                </p>
+                <div className="space-y-2 text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+                    <p>뉴스에 등장한 청연 소식!</p>
+                    <p>어떤 활동이 있었는지 확인해 보세요!</p>
+                </div>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
                 {posts.length > 0 ? (
                     posts.map((post: any) => (
                         <PostCard key={post._id} post={post} />

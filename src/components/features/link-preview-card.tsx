@@ -47,7 +47,7 @@ export async function LinkPreviewCard({ item }: LinkCardProps) {
                     )}
                 </div>
                 <CardHeader className="p-4 pb-2">
-                    <h3 className="font-serif text-lg font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                    <h3 className="text-lg font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
                         {title || item.url}
                     </h3>
                 </CardHeader>
