@@ -1,51 +1,65 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import Image from "next/image";
 
 export function HeroSection() {
     return (
-        <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-background px-4 py-20">
+        <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-4 py-20">
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0 -z-10">
+                {/* 배경 이미지 - 원본 사이트 스타일 */}
+                <div 
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style={{
+                        backgroundImage: "url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2000')",
+                        filter: "brightness(0.4)",
+                    }}
+                />
+                {/* 그라데이션 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
+                {/* 파란색 액센트 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
+            </div>
+
             <div className="container relative z-10 mx-auto text-center">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="space-y-8"
                 >
-                    <h1 className="mb-6 text-5xl font-bold tracking-tight text-foreground sm:text-7xl">
-                        Powerhouse Korea
+                    <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl md:text-7xl leading-tight">
+                        <span className="block mb-4">대한민국의 새로운 미래,</span>
+                        <span className="block">청년들의 책임지는 참여로</span>
+                        <span className="block">만들어 나갑니다!</span>
                     </h1>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                >
-                    <p className="mb-10 text-lg text-muted-foreground sm:text-xl max-w-2xl mx-auto">
-                        사람과 아이디어를 연결하는 디지털 허브.<br className="hidden sm:block" />
-                        우리는 더 나은 미래를 위해 함께 고민하고 행동합니다.
-                    </p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-                    className="flex flex-col gap-4 sm:flex-row sm:justify-center"
-                >
-                    <Button size="lg" className="text-base px-8" asChild>
-                        <Link href="/about">소개 보기</Link>
-                    </Button>
-                    <Button size="lg" variant="outline" className="text-base px-8" asChild>
-                        <Link href="/news">최신 소식</Link>
-                    </Button>
                 </motion.div>
             </div>
 
-            {/* Background Decoration */}
-            <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-background to-background opacity-50" />
+            {/* Floating particles effect */}
+            <div className="absolute inset-0 -z-10 overflow-hidden">
+                {[...Array(20)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        className="absolute w-2 h-2 rounded-full bg-primary/30"
+                        initial={{
+                            x: Math.random() * 100 + "%",
+                            y: Math.random() * 100 + "%",
+                            opacity: 0,
+                        }}
+                        animate={{
+                            y: [null, Math.random() * -100 - 50],
+                            opacity: [0, 1, 0],
+                        }}
+                        transition={{
+                            duration: Math.random() * 3 + 2,
+                            repeat: Infinity,
+                            delay: Math.random() * 2,
+                        }}
+                    />
+                ))}
+            </div>
         </section>
     );
 }

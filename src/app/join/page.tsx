@@ -27,7 +27,7 @@ export default function JoinPage() {
                     </h2>
                     <div className="flex justify-center gap-4 pt-4">
                         <Button size="lg" asChild>
-                            <Link href="https://docs.google.com/forms/d/e/1FAIpQLSdX8..." target="_blank">
+                            <Link href="https://secure.donus.org/powerhouse/pay/step1" target="_blank" rel="noopener noreferrer">
                                 회원가입 및 후원하기
                             </Link>
                         </Button>
