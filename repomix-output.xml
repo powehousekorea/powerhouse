@@ -1,0 +1,1652 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+web/.gitignore
+web/eslint.config.mjs
+web/migration/ghost.json
+web/migration/migrate.ts
+web/next.config.ts
+web/package.json
+web/postcss.config.mjs
+web/public/file.svg
+web/public/globe.svg
+web/public/next.svg
+web/public/vercel.svg
+web/public/window.svg
+web/README.md
+web/sanity.cli.ts
+web/sanity.config.ts
+web/src/app/(studio)/layout.tsx
+web/src/app/(studio)/studio/[[...tool]]/page.tsx
+web/src/app/about/page.tsx
+web/src/app/api/og/route.ts
+web/src/app/blog/[slug]/page.tsx
+web/src/app/blog/page.tsx
+web/src/app/favicon.ico
+web/src/app/globals.css
+web/src/app/insights/page.tsx
+web/src/app/layout.tsx
+web/src/app/media/page.tsx
+web/src/app/page.tsx
+web/src/components/features/BlogCard.tsx
+web/src/components/features/LinkCard.tsx
+web/src/components/features/PostList.tsx
+web/src/components/layout/Footer.tsx
+web/src/components/layout/Header.tsx
+web/src/sanity/components/UrlInput.tsx
+web/src/sanity/env.ts
+web/src/sanity/lib/client.ts
+web/src/sanity/lib/image.ts
+web/src/sanity/lib/queries.ts
+web/src/sanity/schemaTypes/authorType.ts
+web/src/sanity/schemaTypes/categoryType.ts
+web/src/sanity/schemaTypes/index.ts
+web/src/sanity/schemaTypes/linkType.ts
+web/src/sanity/schemaTypes/postType.ts
+web/src/sanity/structure.ts
+web/tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="web/src/app/media/page.tsx">
+import { client } from '@/sanity/lib/client'
+import { LINKS_QUERY } from '@/sanity/lib/queries'
+import { LinkCard } from '@/components/features/LinkCard'
+
+export const revalidate = 60
+
+export default async function MediaPage() {
+    const links = await client.fetch(LINKS_QUERY)
+
+    return (
+        <main className="flex flex-col gap-12 py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
+            {/* Header */}
+            <header className="flex flex-col gap-4">
+                <h1 className="text-4xl md:text-5xl font-bold text-foreground">Media</h1>
+                <p className="text-lg text-secondary">뉴스 기사 및 언론 보도</p>
+            </header>
+
+            {/* Links Grid */}
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {links.map((link: any) => (
+                    <LinkCard key={link._id} link={link} />
+                ))}
+            </section>
+
+            {/* Empty State */}
+            {links.length === 0 && (
+                <div className="text-center py-12 text-secondary">
+                    아직 등록된 미디어가 없습니다.
+                </div>
+            )}
+        </main>
+    )
+}
+</file>
+
+<file path="web/.gitignore">
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+</file>
+
+<file path="web/eslint.config.mjs">
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+</file>
+
+<file path="web/package.json">
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@sanity/block-tools": "^3.70.0",
+    "@sanity/client": "^7.13.1",
+    "@sanity/icons": "^3.7.4",
+    "@sanity/image-url": "^2.0.1",
+    "@sanity/schema": "^4.19.0",
+    "@sanity/ui": "^3.1.11",
+    "@sanity/vision": "^4.19.0",
+    "@types/jsdom": "^27.0.0",
+    "dotenv": "^17.2.3",
+    "jsdom": "^27.2.0",
+    "next": "16.0.5",
+    "next-sanity": "^11.6.10",
+    "open-graph-scraper": "^6.11.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "sanity": "^4.19.0",
+    "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.5",
+    "tailwindcss": "^4",
+    "tsx": "^4.20.6",
+    "typescript": "^5"
+  }
+}
+</file>
+
+<file path="web/postcss.config.mjs">
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+</file>
+
+<file path="web/public/file.svg">
+<svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clip-rule="evenodd" fill="#666" fill-rule="evenodd"/></svg>
+</file>
+
+<file path="web/public/globe.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.27 14.1a6.5 6.5 0 0 0 3.67-3.45q-1.24.21-2.7.34-.31 1.83-.97 3.1M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.48-1.52a7 7 0 0 1-.96 0H7.5a4 4 0 0 1-.84-1.32q-.38-.89-.63-2.08a40 40 0 0 0 3.92 0q-.25 1.2-.63 2.08a4 4 0 0 1-.84 1.31zm2.94-4.76q1.66-.15 2.95-.43a7 7 0 0 0 0-2.58q-1.3-.27-2.95-.43a18 18 0 0 1 0 3.44m-1.27-3.54a17 17 0 0 1 0 3.64 39 39 0 0 1-4.3 0 17 17 0 0 1 0-3.64 39 39 0 0 1 4.3 0m1.1-1.17q1.45.13 2.69.34a6.5 6.5 0 0 0-3.67-3.44q.65 1.26.98 3.1M8.48 1.5l.01.02q.41.37.84 1.31.38.89.63 2.08a40 40 0 0 0-3.92 0q.25-1.2.63-2.08a4 4 0 0 1 .85-1.32 7 7 0 0 1 .96 0m-2.75.4a6.5 6.5 0 0 0-3.67 3.44 29 29 0 0 1 2.7-.34q.31-1.83.97-3.1M4.58 6.28q-1.66.16-2.95.43a7 7 0 0 0 0 2.58q1.3.27 2.95.43a18 18 0 0 1 0-3.44m.17 4.71q-1.45-.12-2.69-.34a6.5 6.5 0 0 0 3.67 3.44q-.65-1.27-.98-3.1" fill="#666"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+</file>
+
+<file path="web/public/next.svg">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 394 80"><path fill="#000" d="M262 0h68.5v12.7h-27.2v66.6h-13.6V12.7H262V0ZM149 0v12.7H94v20.4h44.3v12.6H94v21h55v12.6H80.5V0h68.7zm34.3 0h-17.8l63.8 79.4h17.9l-32-39.7 32-39.6h-17.9l-23 28.6-23-28.6zm18.3 56.7-9-11-27.1 33.7h17.8l18.3-22.7z"/><path fill="#000" d="M81 79.3 17 0H0v79.3h13.6V17l50.2 62.3H81Zm252.6-.4c-1 0-1.8-.4-2.5-1s-1.1-1.6-1.1-2.6.3-1.8 1-2.5 1.6-1 2.6-1 1.8.3 2.5 1a3.4 3.4 0 0 1 .6 4.3 3.7 3.7 0 0 1-3 1.8zm23.2-33.5h6v23.3c0 2.1-.4 4-1.3 5.5a9.1 9.1 0 0 1-3.8 3.5c-1.6.8-3.5 1.3-5.7 1.3-2 0-3.7-.4-5.3-1s-2.8-1.8-3.7-3.2c-.9-1.3-1.4-3-1.4-5h6c.1.8.3 1.6.7 2.2s1 1.2 1.6 1.5c.7.4 1.5.5 2.4.5 1 0 1.8-.2 2.4-.6a4 4 0 0 0 1.6-1.8c.3-.8.5-1.8.5-3V45.5zm30.9 9.1a4.4 4.4 0 0 0-2-3.3 7.5 7.5 0 0 0-4.3-1.1c-1.3 0-2.4.2-3.3.5-.9.4-1.6 1-2 1.6a3.5 3.5 0 0 0-.3 4c.3.5.7.9 1.3 1.2l1.8 1 2 .5 3.2.8c1.3.3 2.5.7 3.7 1.2a13 13 0 0 1 3.2 1.8 8.1 8.1 0 0 1 3 6.5c0 2-.5 3.7-1.5 5.1a10 10 0 0 1-4.4 3.5c-1.8.8-4.1 1.2-6.8 1.2-2.6 0-4.9-.4-6.8-1.2-2-.8-3.4-2-4.5-3.5a10 10 0 0 1-1.7-5.6h6a5 5 0 0 0 3.5 4.6c1 .4 2.2.6 3.4.6 1.3 0 2.5-.2 3.5-.6 1-.4 1.8-1 2.4-1.7a4 4 0 0 0 .8-2.4c0-.9-.2-1.6-.7-2.2a11 11 0 0 0-2.1-1.4l-3.2-1-3.8-1c-2.8-.7-5-1.7-6.6-3.2a7.2 7.2 0 0 1-2.4-5.7 8 8 0 0 1 1.7-5 10 10 0 0 1 4.3-3.5c2-.8 4-1.2 6.4-1.2 2.3 0 4.4.4 6.2 1.2 1.8.8 3.2 2 4.3 3.4 1 1.4 1.5 3 1.5 5h-5.8z"/></svg>
+</file>
+
+<file path="web/public/vercel.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1155 1000"><path d="m577.3 0 577.4 1000H0z" fill="#fff"/></svg>
+</file>
+
+<file path="web/public/window.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.5h13v10a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1zM0 1h16v11.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 0 12.5zm3.75 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M7 4.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5" fill="#666"/></svg>
+</file>
+
+<file path="web/README.md">
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+</file>
+
+<file path="web/sanity.cli.ts">
+/**
+* This configuration file lets you run `$ sanity [command]` in this folder
+* Go to https://www.sanity.io/docs/cli to learn more.
+**/
+import { defineCliConfig } from 'sanity/cli'
+
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+
+export default defineCliConfig({ api: { projectId, dataset } })
+</file>
+
+<file path="web/sanity.config.ts">
+'use client'
+
+/**
+ * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
+ */
+
+import {visionTool} from '@sanity/vision'
+import {defineConfig} from 'sanity'
+import {structureTool} from 'sanity/structure'
+
+// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
+import {apiVersion, dataset, projectId} from './src/sanity/env'
+import {schema} from './src/sanity/schemaTypes'
+import {structure} from './src/sanity/structure'
+
+export default defineConfig({
+  basePath: '/studio',
+  projectId,
+  dataset,
+  // Add and edit the content schema in the './sanity/schemaTypes' folder
+  schema,
+  plugins: [
+    structureTool({structure}),
+    // Vision is a tool that lets you query your content with GROQ in the studio
+    // https://www.sanity.io/docs/the-vision-plugin
+    visionTool({defaultApiVersion: apiVersion}),
+  ],
+})
+</file>
+
+<file path="web/src/app/(studio)/layout.tsx">
+export default function StudioLayout({
+    children,
+}: {
+    children: React.ReactNode
+}) {
+    return <>{children}</>
+}
+</file>
+
+<file path="web/src/app/(studio)/studio/[[...tool]]/page.tsx">
+/**
+ * This route is responsible for the built-in authoring environment using Sanity Studio.
+ * All routes under your studio path is handled by this file using Next.js's catch-all routes:
+ * https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes
+ *
+ * You can learn more about the next-sanity package here:
+ * https://github.com/sanity-io/next-sanity
+ */
+
+import { NextStudio } from 'next-sanity/studio'
+import config from '../../../../../sanity.config'
+
+export const dynamic = 'force-static'
+
+export { metadata, viewport } from 'next-sanity/studio'
+
+export default function StudioPage() {
+    return <NextStudio config={config} />
+}
+</file>
+
+<file path="web/src/app/api/og/route.ts">
+import { NextResponse } from 'next/server';
+import ogs from 'open-graph-scraper';
+
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const url = searchParams.get('url');
+
+    if (!url) {
+        return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+    }
+
+    try {
+        const { result } = await ogs({ url });
+
+        return NextResponse.json({
+            title: result.ogTitle || result.twitterTitle || '',
+            description: result.ogDescription || result.twitterDescription || '',
+            image: result.ogImage?.[0]?.url || result.twitterImage?.[0]?.url || '',
+        });
+    } catch (error) {
+        console.error('OG Scraping Error:', error);
+        return NextResponse.json({ error: 'Failed to fetch metadata' }, { status: 500 });
+    }
+}
+</file>
+
+<file path="web/src/app/blog/page.tsx">
+import { client } from "@/sanity/lib/client";
+import { POSTS_QUERY } from "@/sanity/lib/queries";
+import { BlogCard } from "@/components/features/BlogCard";
+
+export const revalidate = 60;
+
+export default async function BlogPage() {
+    const posts = await client.fetch(POSTS_QUERY);
+
+    return (
+        <main className="py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto w-full">
+            <div className="flex flex-col gap-12">
+                <div className="flex flex-col gap-4 border-b border-gray-100 pb-8">
+                    <h1 className="text-4xl font-bold tracking-tight text-primary">Blog</h1>
+                    <p className="text-lg text-secondary max-w-2xl">
+                        Thoughts on technology, leadership, and building products that matter.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                    {posts.length > 0 ? (
+                        posts.map((post: any) => (
+                            <BlogCard key={post._id} post={post} />
+                        ))
+                    ) : (
+                        <p className="text-secondary col-span-full py-12 text-center bg-gray-50 rounded-lg">
+                            No posts found.
+                        </p>
+                    )}
+                </div>
+            </div>
+        </main>
+    );
+}
+</file>
+
+<file path="web/src/app/insights/page.tsx">
+import { client } from "@/sanity/lib/client";
+import { LINKS_QUERY } from "@/sanity/lib/queries";
+import { LinkCard } from "@/components/features/LinkCard";
+
+export const revalidate = 60;
+
+export default async function InsightsPage() {
+    const links = await client.fetch(LINKS_QUERY);
+
+    return (
+        <main className="py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto w-full">
+            <div className="flex flex-col gap-12">
+                <div className="flex flex-col gap-4 border-b border-gray-100 pb-8">
+                    <h1 className="text-4xl font-bold tracking-tight text-primary">Insights</h1>
+                    <p className="text-lg text-secondary max-w-2xl">
+                        A curated collection of articles, news, and resources that inspire.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {links.length > 0 ? (
+                        links.map((link: any) => (
+                            <LinkCard key={link._id} link={link} />
+                        ))
+                    ) : (
+                        <p className="text-secondary col-span-full py-12 text-center bg-gray-50 rounded-lg">
+                            No curated links yet.
+                        </p>
+                    )}
+                </div>
+            </div>
+        </main>
+    );
+}
+</file>
+
+<file path="web/src/app/layout.tsx">
+import type { Metadata } from "next";
+import "./globals.css";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+
+export const metadata: Metadata = {
+  title: "Impact Founder",
+  description: "Personal branding website and blog.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
+      </head>
+      <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
+        <Header />
+        {children}
+        <Footer />
+      </body>
+    </html>
+  );
+}
+</file>
+
+<file path="web/src/components/features/BlogCard.tsx">
+import Link from 'next/link'
+import Image from 'next/image'
+import { urlFor } from '@/sanity/lib/image'
+
+interface BlogCardProps {
+    post: {
+        title: string
+        slug: { current: string }
+        mainImage?: any
+        publishedAt: string
+        categories?: { title: string }[]
+    }
+}
+
+export function BlogCard({ post }: BlogCardProps) {
+    return (
+        <Link href={`/blog/${post.slug.current}`} className="group flex flex-col gap-4 p-4 rounded-lg border border-border bg-white hover:shadow-lg transition-all duration-300">
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-muted">
+                {post.mainImage ? (
+                    <Image
+                        src={urlFor(post.mainImage).width(800).height(450).url()}
+                        alt={post.mainImage.alt || post.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                ) : (
+                    <div className="flex h-full items-center justify-center text-secondary">
+                        No Image
+                    </div>
+                )}
+            </div>
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-secondary uppercase tracking-wider">
+                    {post.categories?.[0]?.title || 'Blog'} • {new Date(post.publishedAt).toLocaleDateString()}
+                </div>
+                <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                    {post.title}
+                </h3>
+            </div>
+        </Link>
+    )
+}
+</file>
+
+<file path="web/src/components/features/LinkCard.tsx">
+import Image from 'next/image'
+import { urlFor } from '@/sanity/lib/image'
+
+interface LinkCardProps {
+    link: {
+        url: string
+        title: string
+        description?: string
+        image?: any
+        publishedAt: string
+    }
+}
+
+export function LinkCard({ link }: LinkCardProps) {
+    return (
+        <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col gap-4 p-4 rounded-lg border border-border bg-white hover:shadow-lg transition-all duration-300"
+        >
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-muted">
+                {link.image ? (
+                    <Image
+                        src={urlFor(link.image).width(800).height(450).url()}
+                        alt={link.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                ) : (
+                    <div className="flex h-full items-center justify-center text-secondary">
+                        No Image
+                    </div>
+                )}
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs font-medium text-secondary uppercase tracking-wider">
+                    {new Date(link.publishedAt).toLocaleDateString()}
+                </span>
+                <h3 className="text-lg font-semibold text-foreground group-hover:text-accent transition-colors line-clamp-2">
+                    {link.title}
+                </h3>
+                {link.description && (
+                    <p className="text-sm text-secondary line-clamp-2">
+                        {link.description}
+                    </p>
+                )}
+            </div>
+        </a>
+    )
+}
+</file>
+
+<file path="web/src/components/features/PostList.tsx">
+"use client"
+
+import { useState } from "react"
+import { BlogCard } from "./BlogCard"
+
+interface Category {
+    _id: string
+    title: string
+    slug: {
+        current: string
+    }
+}
+
+interface Post {
+    _id: string
+    title: string
+    slug: {
+        current: string
+    }
+    publishedAt: string
+    mainImage: any
+    categories: {
+        title: string
+    }[]
+}
+
+interface PostListProps {
+    posts: Post[]
+    categories: Category[]
+}
+
+export function PostList({ posts, categories }: PostListProps) {
+    const [selectedCategory, setSelectedCategory] = useState<string>("all")
+
+    const filteredPosts = selectedCategory === "all"
+        ? posts
+        : posts.filter(post =>
+            post.categories?.some(cat => cat.title === selectedCategory)
+        )
+
+    {/* Post Grid */ }
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px]">
+        {filteredPosts.length > 0 ? (
+            filteredPosts.map((post) => (
+                <BlogCard key={post._id} post={post} />
+            ))
+        ) : (
+            <div className="col-span-full flex items-center justify-center text-secondary">
+                해당 카테고리에 글이 없습니다.
+            </div>
+        )}
+    </div>
+        </div >
+    )
+}
+</file>
+
+<file path="web/src/components/layout/Footer.tsx">
+export function Footer() {
+    return (
+        <footer className="w-full py-12 px-6 md:px-12 lg:px-24 border-t border-gray-100 mt-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div className="text-sm text-secondary">
+                    © {new Date().getFullYear()} Impact Founder. All rights reserved.
+                </div>
+                <div className="flex gap-6 text-sm text-secondary">
+                    <a href="#" className="hover:text-primary transition-colors">Twitter</a>
+                    <a href="#" className="hover:text-primary transition-colors">LinkedIn</a>
+                    <a href="#" className="hover:text-primary transition-colors">Email</a>
+                </div>
+            </div>
+        </footer>
+    )
+}
+</file>
+
+<file path="web/src/components/layout/Header.tsx">
+import Link from 'next/link'
+
+export function Header() {
+    return (
+        <header className="w-full py-4 px-6 md:px-12 lg:px-24 flex justify-between items-center bg-white border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-white/95">
+
+            {/* 로고 */}
+            <Link href="/" className="text-xl font-bold tracking-tight text-foreground hover:text-primary transition-colors">
+                IMPACT FOUNDER
+            </Link>
+
+            {/* PC 메뉴: About을 가장 위로 올렸습니다 */}
+            <nav className="hidden md:flex gap-8">
+                {/* 1. About (가장 왼쪽) */}
+                <Link href="/about" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
+                    About
+                </Link>
+
+                {/* 2. Blog */}
+                <Link href="/blog" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
+                    Blog
+                </Link>
+
+                {/* 3. Media */}
+                <Link href="/media" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
+                    Media
+                </Link>
+            </nav>
+
+            {/* 모바일 메뉴 버튼 */}
+            <button className="md:hidden p-2 text-secondary hover:bg-muted rounded transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
+
+        </header>
+    )
+}
+</file>
+
+<file path="web/src/sanity/components/UrlInput.tsx">
+import { Button, Stack, useToast, Box } from '@sanity/ui'
+import { useCallback, useState } from 'react'
+import { set, type ObjectInputProps } from 'sanity'
+
+export function LinkMetadataInput(props: ObjectInputProps) {
+    const { onChange, members, renderDefault } = props
+    const [isLoading, setIsLoading] = useState(false)
+    const toast = useToast()
+
+    // Find the URL member to get its value
+    const urlMember = members.find((member) => member.kind === 'field' && member.name === 'url')
+
+    // Safe access to value
+    // @ts-ignore
+    const urlValue = urlMember?.field?.value
+
+    const handleFetch = useCallback(async () => {
+        if (!urlValue) {
+            toast.push({ status: 'error', title: 'URL is missing' })
+            return
+        }
+
+        setIsLoading(true)
+        try {
+            const response = await fetch(`/api/og?url=${encodeURIComponent(urlValue)}`)
+            const data = await response.json()
+
+            if (data.error) throw new Error(data.error)
+
+            const patches = [
+                set(data.title, ['title']),
+                set(data.description, ['description']),
+            ]
+
+            onChange(patches)
+
+            toast.push({
+                status: 'success',
+                title: 'Metadata Fetched',
+                description: 'Title and Description updated.',
+            })
+        } catch (err) {
+            console.error(err)
+            toast.push({
+                status: 'error',
+                title: 'Fetch Failed',
+                description: 'Could not fetch metadata.',
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }, [urlValue, onChange, toast])
+
+    return (
+        <Stack space={3}>
+            {renderDefault({
+                ...props,
+                renderDefault: undefined
+            })}
+            <Box padding={2}>
+                <Button
+                    mode="ghost"
+                    tone="primary"
+                    onClick={handleFetch}
+                    text={isLoading ? 'Fetching Metadata...' : '✨ Auto-Fill Metadata'}
+                    disabled={isLoading || !urlValue}
+                />
+            </Box>
+        </Stack>
+    )
+}
+</file>
+
+<file path="web/src/sanity/env.ts">
+export const apiVersion =
+    process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-11-30'
+
+export const dataset = assertValue(
+    process.env.NEXT_PUBLIC_SANITY_DATASET,
+    'Missing environment variable: NEXT_PUBLIC_SANITY_DATASET'
+)
+
+export const projectId = assertValue(
+    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    'Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID'
+)
+
+function assertValue<T>(v: T | undefined, errorMessage: string): T {
+    if (v === undefined) {
+        throw new Error(errorMessage)
+    }
+    return v
+}
+</file>
+
+<file path="web/src/sanity/lib/client.ts">
+import { createClient } from 'next-sanity'
+
+import { apiVersion, dataset, projectId } from '../env'
+
+export const client = createClient({
+    projectId,
+    dataset,
+    apiVersion,
+    useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+})
+</file>
+
+<file path="web/src/sanity/lib/image.ts">
+import { createImageUrlBuilder } from '@sanity/image-url'
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
+
+import { dataset, projectId } from '../env'
+
+// https://www.sanity.io/docs/image-url
+const builder = createImageUrlBuilder({ projectId, dataset })
+
+export const urlFor = (source: SanityImageSource) => {
+    return builder.image(source)
+}
+</file>
+
+<file path="web/src/sanity/schemaTypes/authorType.ts">
+import { UserIcon } from '@sanity/icons'
+import { defineField, defineType } from 'sanity'
+
+export const authorType = defineType({
+    name: 'author',
+    title: 'Author',
+    type: 'document',
+    icon: UserIcon,
+    fields: [
+        defineField({
+            name: 'name',
+            type: 'string',
+        }),
+        defineField({
+            name: 'slug',
+            type: 'slug',
+            options: {
+                source: 'name',
+            },
+        }),
+        defineField({
+            name: 'image',
+            type: 'image',
+            options: {
+                hotspot: true,
+            },
+        }),
+        defineField({
+            name: 'bio',
+            type: 'array',
+            of: [
+                {
+                    title: 'Block',
+                    type: 'block',
+                    styles: [{ title: 'Normal', value: 'normal' }],
+                    lists: [],
+                },
+            ],
+        }),
+    ],
+    preview: {
+        select: {
+            title: 'name',
+            media: 'image',
+        },
+    },
+})
+</file>
+
+<file path="web/src/sanity/schemaTypes/categoryType.ts">
+import { TagIcon } from '@sanity/icons'
+import { defineField, defineType } from 'sanity'
+
+export const categoryType = defineType({
+    name: 'category',
+    title: 'Category',
+    type: 'document',
+    icon: TagIcon,
+    fields: [
+        defineField({
+            name: 'title',
+            type: 'string',
+        }),
+        defineField({
+            name: 'slug',
+            type: 'slug',
+            options: {
+                source: 'title',
+            },
+        }),
+        defineField({
+            name: 'description',
+            type: 'text',
+        }),
+    ],
+})
+</file>
+
+<file path="web/src/sanity/schemaTypes/index.ts">
+import { type SchemaTypeDefinition } from 'sanity'
+
+import { authorType } from './authorType'
+import { categoryType } from './categoryType'
+import { linkType } from './linkType'
+import { postType } from './postType'
+
+export const schema: { types: SchemaTypeDefinition[] } = {
+    types: [authorType, categoryType, linkType, postType],
+}
+</file>
+
+<file path="web/src/sanity/schemaTypes/linkType.ts">
+import { LinkIcon } from '@sanity/icons'
+import { defineField, defineType } from 'sanity'
+
+export const linkType = defineType({
+    name: 'link',
+    title: 'Curated Link',
+    type: 'document',
+    icon: LinkIcon,
+    fields: [
+        defineField({
+            name: 'url',
+            title: 'URL',
+            type: 'url',
+            validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: 'title',
+            title: 'Title',
+            type: 'string',
+            description: 'Enter the title manually',
+        }),
+        defineField({
+            name: 'description',
+            title: 'Description',
+            type: 'text',
+            rows: 3,
+        }),
+        defineField({
+            name: 'image',
+            title: 'Cover Image',
+            type: 'image',
+            options: {
+                hotspot: true,
+            },
+        }),
+        defineField({
+            name: 'publishedAt',
+            title: 'Published At',
+            type: 'datetime',
+            initialValue: () => new Date().toISOString(),
+        }),
+    ],
+    preview: {
+        select: {
+            title: 'title',
+            subtitle: 'url',
+            media: 'image',
+        },
+    },
+})
+</file>
+
+<file path="web/src/sanity/schemaTypes/postType.ts">
+import { DocumentTextIcon } from '@sanity/icons'
+import { defineArrayMember, defineField, defineType } from 'sanity'
+
+export const postType = defineType({
+    name: 'post',
+    title: 'Post',
+    type: 'document',
+    icon: DocumentTextIcon,
+    fields: [
+        defineField({
+            name: 'title',
+            type: 'string',
+        }),
+        defineField({
+            name: 'slug',
+            type: 'slug',
+            options: {
+                source: 'title',
+            },
+        }),
+        defineField({
+            name: 'author',
+            type: 'reference',
+            to: { type: 'author' },
+        }),
+        defineField({
+            name: 'mainImage',
+            type: 'image',
+            options: {
+                hotspot: true,
+            },
+            fields: [
+                defineField({
+                    name: 'alt',
+                    type: 'string',
+                    title: 'Alternative text',
+                })
+            ]
+        }),
+        defineField({
+            name: 'categories',
+            type: 'array',
+            of: [defineArrayMember({ type: 'reference', to: { type: 'category' } })],
+        }),
+        defineField({
+            name: 'publishedAt',
+            type: 'datetime',
+        }),
+        defineField({
+            name: 'body',
+            type: 'array',
+            of: [defineArrayMember({ type: 'block' })],
+        }),
+    ],
+    preview: {
+        select: {
+            title: 'title',
+            author: 'author.name',
+            media: 'mainImage',
+        },
+        prepare(selection) {
+            const { author } = selection
+            return { ...selection, subtitle: author && `by ${author}` }
+        },
+    },
+})
+</file>
+
+<file path="web/src/sanity/structure.ts">
+import type { StructureResolver } from 'sanity/structure'
+
+// https://www.sanity.io/docs/structure-builder-cheat-sheet
+export const structure: StructureResolver = (S) =>
+    S.list()
+        .title('Content')
+        .items(S.documentTypeListItems())
+</file>
+
+<file path="web/tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+</file>
+
+<file path="web/next.config.ts">
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // 👇 이 부분이 핵심입니다!
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // 👆 여기까지
+  
+  // 혹시 이미지 관련 설정이 있다면 남겨두세요. (없으면 무시)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+      },
+    ],
+  },
+};
+
+export default nextConfig;
+</file>
+
+<file path="web/src/app/about/page.tsx">
+import { client } from '@/sanity/lib/client'
+import { defineQuery } from 'next-sanity'
+import { PortableText } from 'next-sanity'
+import Image from 'next/image'
+import { urlFor } from '@/sanity/lib/image'
+
+const ABOUT_PAGE_QUERY = defineQuery(`*[_type == "post" && slug.current == "about"][0] {
+  _id,
+  title,
+  body,
+  mainImage
+}`)
+
+export const revalidate = 60
+
+// Portable Text components for proper styling
+const portableTextComponents = {
+    block: {
+        h1: ({ children }: any) => (
+            <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-primary">{children}</h1>
+        ),
+        h2: ({ children }: any) => (
+            <h2 className="text-2xl md:text-3xl font-bold mt-10 mb-4 text-primary">{children}</h2>
+        ),
+        h3: ({ children }: any) => (
+            <h3 className="text-xl md:text-2xl font-semibold mt-8 mb-3 text-primary">{children}</h3>
+        ),
+        h4: ({ children }: any) => (
+            <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 text-primary">{children}</h4>
+        ),
+        normal: ({ children }: any) => (
+            <p className="mb-5 leading-relaxed text-foreground whitespace-pre-wrap">{children}</p>
+        ),
+    },
+    marks: {
+        strong: ({ children }: any) => <strong className="font-bold text-primary">{children}</strong>,
+        em: ({ children }: any) => <em className="italic">{children}</em>,
+        link: ({ value, children }: any) => (
+            <a
+                href={value?.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:underline"
+            >
+                {children}
+            </a>
+        ),
+    },
+    list: {
+        bullet: ({ children }: any) => (
+            <ul className="list-disc list-inside mb-5 space-y-1 text-foreground">{children}</ul>
+        ),
+        number: ({ children }: any) => (
+            <ol className="list-decimal list-inside mb-5 space-y-1 text-foreground">{children}</ol>
+        ),
+    },
+    listItem: {
+        bullet: ({ children }: any) => (
+            <li className="mb-1">{children}</li>
+        ),
+        number: ({ children }: any) => (
+            <li className="mb-1">{children}</li>
+        ),
+    },
+}
+
+export default async function AboutPage() {
+    const page = await client.fetch(ABOUT_PAGE_QUERY)
+
+    if (!page) {
+        return (
+            <div className="py-24 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto">
+                <h1 className="text-4xl font-bold mb-8">About</h1>
+                <p className="text-lg text-secondary">페이지를 불러올 수 없습니다.</p>
+            </div>
+        )
+    }
+
+    return (
+        <article className="py-12 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto w-full flex flex-col gap-8">
+            {/* Header */}
+            <header className="flex flex-col gap-6 items-center">
+                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-primary leading-tight">
+                    {page.title}
+                </h1>
+            </header>
+
+            {/* Main Image */}
+            {page.mainImage && (
+                <div className="relative w-full aspect-[16/9] rounded-sm overflow-hidden">
+                    <Image
+                        src={urlFor(page.mainImage).width(1200).height(675).url()}
+                        alt={page.mainImage.alt || page.title}
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                </div>
+            )}
+
+            {/* Content */}
+            {page.body && (
+                <div className="flex flex-col max-w-none">
+                    <PortableText value={page.body} components={portableTextComponents} />
+                </div>
+            )}
+        </article>
+    )
+}
+</file>
+
+<file path="web/src/app/blog/[slug]/page.tsx">
+import { client } from "@/sanity/lib/client";
+import { POST_QUERY } from "@/sanity/lib/queries";
+import { urlFor } from "@/sanity/lib/image";
+import Image from "next/image";
+import { PortableText } from "next-sanity";
+import { notFound } from "next/navigation";
+
+export const revalidate = 60;
+
+interface PageProps {
+    params: Promise<{ slug: string }>;
+}
+
+// Portable Text components for proper styling
+const portableTextComponents = {
+    block: {
+        h1: ({ children }: any) => (
+            <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-primary">{children}</h1>
+        ),
+        h2: ({ children }: any) => (
+            <h2 className="text-2xl md:text-3xl font-bold mt-10 mb-4 text-primary">{children}</h2>
+        ),
+        h3: ({ children }: any) => (
+            <h3 className="text-xl md:text-2xl font-semibold mt-8 mb-3 text-primary">{children}</h3>
+        ),
+        h4: ({ children }: any) => (
+            <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 text-primary">{children}</h4>
+        ),
+        normal: ({ children }: any) => (
+            <p className="mb-5 leading-relaxed text-foreground whitespace-pre-wrap">{children}</p>
+        ),
+    },
+    marks: {
+        strong: ({ children }: any) => <strong className="font-bold text-primary">{children}</strong>,
+        em: ({ children }: any) => <em className="italic">{children}</em>,
+        link: ({ value, children }: any) => (
+            <a
+                href={value?.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:underline"
+            >
+                {children}
+            </a>
+        ),
+    },
+    list: {
+        bullet: ({ children }: any) => (
+            <ul className="list-disc list-inside mb-5 space-y-1 text-foreground">{children}</ul>
+        ),
+        number: ({ children }: any) => (
+            <ol className="list-decimal list-inside mb-5 space-y-1 text-foreground">{children}</ol>
+        ),
+    },
+    listItem: {
+        bullet: ({ children }: any) => (
+            <li className="mb-1">{children}</li>
+        ),
+        number: ({ children }: any) => (
+            <li className="mb-1">{children}</li>
+        ),
+    },
+}
+
+export default async function BlogPostPage({ params }: PageProps) {
+    const { slug } = await params;
+    const post = await client.fetch(POST_QUERY, { slug });
+
+    if (!post) {
+        notFound();
+    }
+
+    return (
+        <article className="py-12 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto w-full flex flex-col gap-8">
+            {/* Header */}
+            <header className="flex flex-col gap-6 text-center items-center">
+                <div className="flex items-center gap-2 text-sm font-medium text-secondary uppercase tracking-wider">
+                    {post.categories?.[0]?.title || 'Blog'} • {new Date(post.publishedAt).toLocaleDateString()}
+                </div>
+                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-primary leading-tight">
+                    {post.title}
+                </h1>
+                {post.author && (
+                    <div className="flex items-center gap-3 mt-2">
+                        {post.author.image && (
+                            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+                                <Image
+                                    src={urlFor(post.author.image).width(100).height(100).url()}
+                                    alt={post.author.name}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                        )}
+                        <div className="text-left">
+                            <p className="text-sm font-semibold text-primary">{post.author.name}</p>
+                        </div>
+                    </div>
+                )}
+            </header>
+
+            {/* Main Image */}
+            {post.mainImage && (
+                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-gray-100 my-4">
+                    <Image
+                        src={urlFor(post.mainImage).width(1200).height(675).url()}
+                        alt={post.mainImage.alt || post.title}
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                </div>
+            )}
+
+            {/* Content */}
+            <div className="flex flex-col max-w-none">
+                {post.body ? <PortableText value={post.body} components={portableTextComponents} /> : <p className="text-gray-500 italic">No content...</p>}
+            </div>
+        </article>
+    );
+}
+</file>
+
+<file path="web/src/sanity/lib/queries.ts">
+import { defineQuery } from "next-sanity";
+
+// Get all posts (excluding About page)
+export const POSTS_QUERY = defineQuery(`*[_type == "post" && defined(slug.current) && slug.current != "about"] | order(publishedAt desc) {
+  _id,
+  title,
+  slug,
+  publishedAt,
+  mainImage,
+  categories[]->{title}
+}`);
+
+// Get latest 3 posts (excluding About page)
+export const LATEST_POSTS_QUERY = defineQuery(`*[_type == "post" && defined(slug.current) && slug.current != "about"] | order(publishedAt desc)[0...3] {
+  _id,
+  title,
+  slug,
+  publishedAt,
+  mainImage,
+  categories[]->{title}
+}`);
+
+export const POST_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0] {
+  _id,
+  title,
+  slug,
+  publishedAt,
+  mainImage,
+  body,
+  author->{name, image, bio},
+  categories[]->{title}
+}`);
+
+export const LINKS_QUERY = defineQuery(`*[_type == "link"] | order(publishedAt desc) {
+  _id,
+  url,
+  title,
+  description,
+  image,
+  publishedAt
+}`);
+
+export const LATEST_LINKS_QUERY = defineQuery(`*[_type == "link"] | order(publishedAt desc)[0...4] {
+  _id,
+  url,
+  title,
+  description,
+  image,
+  publishedAt
+}`);
+
+export const CATEGORIES_QUERY = defineQuery(`*[_type == "category"] | order(title asc) {
+  _id,
+  title,
+  slug
+}`);
+</file>
+
+<file path="web/migration/migrate.ts">
+import { createClient } from '@sanity/client'
+import { JSDOM } from 'jsdom'
+import { htmlToBlocks } from '@sanity/block-tools'
+import { Schema } from '@sanity/schema'
+import fs from 'fs'
+import path from 'path'
+import dotenv from 'dotenv'
+
+// Load environment variables
+dotenv.config({ path: path.join(process.cwd(), '.env.local') })
+
+// Load Ghost Data
+const ghostDataPath = path.join(process.cwd(), 'migration', 'ghost.json')
+const ghostData = JSON.parse(fs.readFileSync(ghostDataPath, 'utf-8'))
+
+// Sanity Client
+const client = createClient({
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+    apiVersion: '2024-11-30',
+    useCdn: false,
+    token: process.env.SANITY_API_TOKEN!,
+})
+
+// Schema for block-tools
+const defaultSchema = Schema.compile({
+    name: 'default',
+    types: [
+        {
+            type: 'object',
+            name: 'blogPost',
+            fields: [
+                {
+                    title: 'Body',
+                    name: 'body',
+                    type: 'array',
+                    of: [{ type: 'block' }],
+                },
+            ],
+        },
+    ],
+})
+
+const blockContentType = defaultSchema
+    .get('blogPost')
+    .fields.find((field: any) => field.name === 'body').type
+
+// Helper to upload image
+async function uploadImage(url: string) {
+    try {
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Failed to fetch: ${url}`)
+        const buffer = await response.arrayBuffer()
+        const asset = await client.assets.upload('image', Buffer.from(buffer), {
+            filename: path.basename(url),
+        })
+        return asset
+    } catch (error) {
+        console.error(`Error uploading ${url}:`, error)
+        return null
+    }
+}
+
+async function migrate() {
+    const posts = ghostData.db[0].data.posts
+    // Include both 'post' and 'page' types
+    const postsToMigrate = posts.filter(
+        (p: any) => (p.type === 'post' || p.type === 'page') && p.status === 'published'
+    )
+
+    console.log(`Found ${postsToMigrate.length} items to migrate.`)
+
+    for (const post of postsToMigrate) {
+        console.log(`Migrating: ${post.title} (${post.type})`)
+
+        // 1. Process Image
+        let mainImage = null
+        if (post.feature_image) {
+            const imageUrl = post.feature_image.replace(
+                '__GHOST_URL__',
+                'https://jaewook.ghost.io'
+            )
+            const asset = await uploadImage(imageUrl)
+            if (asset) {
+                mainImage = {
+                    _type: 'image',
+                    asset: {
+                        _type: 'reference',
+                        _ref: asset._id,
+                    },
+                }
+            }
+        }
+// 배포 트리거용 주석
+        // 2. Process HTML to Portable Text
+        let body: any[] = []
+        if (post.html) {
+            const html = post.html.replace(/__GHOST_URL__/g, 'https://jaewook.ghost.io')
+            try {
+                body = htmlToBlocks(html, blockContentType, {
+                    parseHtml: (html) => new JSDOM(html).window.document,
+                })
+            } catch (err) {
+                console.error(`Failed to convert HTML for ${post.title}:`, err)
+            }
+        }
+
+        // 3. Create Sanity Document
+        const doc = {
+            _type: 'post',
+            _id: `ghost-${post.id}`,
+            title: post.title,
+            slug: { _type: 'slug', current: post.slug },
+            publishedAt: new Date(post.published_at).toISOString(),
+            mainImage,
+            body,
+        }
+
+        try {
+            await client.createOrReplace(doc)
+            console.log(`✅ Created: ${post.title}`)
+        } catch (err) {
+            console.error(`❌ Failed: ${post.title}`, err)
+        }
+    }
+
+    console.log('\n🎉 Migration complete!')
+}
+
+migrate().catch(console.error)
+</file>
+
+<file path="web/src/app/globals.css">
+@import "tailwindcss";
+
+:root {
+  --background: #FAFAFA;
+  --foreground: #1A1A1A;
+  --primary: #2E2E2E;
+  --secondary: #6B6B6B;
+  --accent: #0066FF;
+  --muted: #F5F5F5;
+  --border: #E5E5E5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  overflow-y: scroll;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+</file>
+
+<file path="web/src/app/page.tsx">
+import { client } from '@/sanity/lib/client'
+import { POSTS_QUERY, CATEGORIES_QUERY, LATEST_LINKS_QUERY } from '@/sanity/lib/queries'
+import { PostList } from '@/components/features/PostList'
+import { LinkCard } from '@/components/features/LinkCard'
+import Link from 'next/link'
+
+export const revalidate = 60
+
+export default async function Home() {
+    const posts = await client.fetch(POSTS_QUERY)
+    const categories = await client.fetch(CATEGORIES_QUERY)
+    const links = await client.fetch(LATEST_LINKS_QUERY)
+
+    return (
+        <main className="flex flex-col gap-24 py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
+            {/* Latest Posts with Category Filter */}
+            <section className="flex flex-col gap-8">
+                <PostList posts={posts} categories={categories} />
+            </section>
+
+            {/* Media Section */}
+            <section className="flex flex-col gap-8">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-3xl font-bold text-foreground">MEDIA</h2>
+                    <Link href="/media" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
+                        전체 보기 →
+                    </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {links.map((link: any) => (
+                        <LinkCard key={link._id} link={link} />
+                    ))}
+                </div>
+            </section>
+        </main>
+    )
+}
+</file>
+
+</files>
