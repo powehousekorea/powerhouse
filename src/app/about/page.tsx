@@ -1,11 +1,10 @@
-import { Metadata } from "next";
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-
-export const metadata: Metadata = {
-    title: "About | Powerhouse Korea",
-    description: "한국청년유권자연맹(청연)을 소개합니다.",
-};
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import { fadeInUp, staggerContainer, scaleIn } from "@/lib/animations";
 
 const HISTORY_ITEMS = [
     {
@@ -58,60 +57,82 @@ const HISTORY_ITEMS = [
     }
 ];
 
+function AnimatedSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+    return (
+        <motion.div
+            ref={ref}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            variants={staggerContainer}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
+}
+
 export default function AboutPage() {
     return (
         <div className="container mx-auto px-4 py-16 max-w-6xl">
             {/* Intro Section */}
-            <div className="text-center mb-24 space-y-8">
-                <div className="space-y-4">
+            <AnimatedSection className="text-center mb-24 space-y-8">
+                <motion.div variants={fadeInUp} className="space-y-4">
                     <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
                         청연을<br />소개합니다!
                     </h1>
                     <div className="w-20 h-1 bg-primary mx-auto opacity-50" />
-                </div>
-                <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                </motion.div>
+                <motion.p variants={fadeInUp} className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                     무한한 잠재력과 열정을 지닌 청년세대들이 스스로를 개척하고, 책임지는 참여를 통해<br className="hidden md:block" />
                     사회변혁은 물론 미래를 창조하는 글로벌 인재로 성장할 수 있도록 하는데 그 목적을 두고 있습니다.
-                </p>
-            </div>
+                </motion.p>
+            </AnimatedSection>
 
             {/* Mission Section */}
-            <section className="mb-32">
-                <div className="bg-muted/30 rounded-3xl p-8 md:p-12 text-center">
+            <AnimatedSection className="mb-32">
+                <motion.div variants={fadeInUp} className="bg-muted/30 rounded-3xl p-8 md:p-12 text-center">
                     <h2 className="text-3xl font-bold mb-8">한국청년유권자연맹 (청연)은?</h2>
                     <div className="space-y-8 text-lg">
                         <p className="font-medium text-xl leading-relaxed">
                             정치적 중립단체로서 <span className="text-primary">시민교육을 실시하는 학교</span>이자 <span className="text-primary">차세대 지도자를 육성</span>하는 인재 양성소,<br className="hidden md:block" />
                             청년들의 권익을 대변하고 비전을 만들어 내는 역동적인 파워하우스의 기능을 담당합니다.
                         </p>
-                        <div className="grid md:grid-cols-3 gap-6 text-left">
-                            <Card className="bg-background border-none shadow-sm">
-                                <CardContent className="p-6">
-                                    <h3 className="font-bold text-lg mb-3 text-primary">첫째</h3>
-                                    <p className="text-muted-foreground">유권자로서 권리와 의무를 올바르게 행사할 수 있도록 민주시민의 자질과 소양을 교육한다.</p>
-                                </CardContent>
-                            </Card>
-                            <Card className="bg-background border-none shadow-sm">
-                                <CardContent className="p-6">
-                                    <h3 className="font-bold text-lg mb-3 text-primary">둘째</h3>
-                                    <p className="text-muted-foreground">청년유권자의 권익을 대변하며, 한국사회의 통합과 민주발전을 위해 청년의 힘을 결집한다.</p>
-                                </CardContent>
-                            </Card>
-                            <Card className="bg-background border-none shadow-sm">
-                                <CardContent className="p-6">
-                                    <h3 className="font-bold text-lg mb-3 text-primary">셋째</h3>
-                                    <p className="text-muted-foreground">미래한국사회를 이끌어갈 차세대 지도자를 발굴, 육성하고 경쟁력 있는 네트워크를 만든다.</p>
-                                </CardContent>
-                            </Card>
-                        </div>
+                        <motion.div
+                            variants={staggerContainer}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="grid md:grid-cols-3 gap-6 text-left"
+                        >
+                            {[
+                                { title: "첫째", desc: "유권자로서 권리와 의무를 올바르게 행사할 수 있도록 민주시민의 자질과 소양을 교육한다." },
+                                { title: "둘째", desc: "청년유권자의 권익을 대변하며, 한국사회의 통합과 민주발전을 위해 청년의 힘을 결집한다." },
+                                { title: "셋째", desc: "미래한국사회를 이끌어갈 차세대 지도자를 발굴, 육성하고 경쟁력 있는 네트워크를 만든다." }
+                            ].map((item, idx) => (
+                                <motion.div key={idx} variants={scaleIn}>
+                                    <Card className="bg-background border-none shadow-sm h-full hover:shadow-md transition-shadow">
+                                        <CardContent className="p-6">
+                                            <h3 className="font-bold text-lg mb-3 text-primary">{item.title}</h3>
+                                            <p className="text-muted-foreground">{item.desc}</p>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </motion.div>
                     </div>
-                </div>
-            </section>
+                </motion.div>
+            </AnimatedSection>
 
             {/* Representative Message */}
-            <section className="mb-32">
-                <h2 className="text-3xl font-bold mb-12 text-center">대표 인사말</h2>
-                <div className="flex flex-col md:flex-row gap-12 items-start bg-card border rounded-2xl p-8 md:p-12 shadow-sm">
+            <AnimatedSection className="mb-32">
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12 text-center">대표 인사말</motion.h2>
+                <motion.div
+                    variants={fadeInUp}
+                    className="flex flex-col md:flex-row gap-12 items-start bg-card border rounded-2xl p-8 md:p-12 shadow-sm hover:shadow-lg transition-shadow"
+                >
                     <div className="w-full md:w-1/3 aspect-[3/4] relative rounded-xl overflow-hidden bg-muted shrink-0">
                         <Image
                             src="https://cdn.imweb.me/thumbnail/20250101/placeholder.jpg"
@@ -144,53 +165,71 @@ export default function AboutPage() {
                             <p>감사합니다.</p>
                         </div>
                     </div>
-                </div>
-            </section>
+                </motion.div>
+            </AnimatedSection>
 
             {/* Major Projects */}
-            <section className="mb-32 text-center">
-                <h2 className="text-3xl font-bold mb-12">주요 사업</h2>
-                <div className="grid md:grid-cols-3 gap-8">
+            <AnimatedSection className="mb-32 text-center">
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12">주요 사업</motion.h2>
+                <motion.div
+                    variants={staggerContainer}
+                    className="grid md:grid-cols-3 gap-8"
+                >
                     {[
                         "청년정책 연구",
                         "청년정치리더 육성",
                         "전국 청년네트워크 강화"
-                    ].map((project) => (
-                        <div key={project} className="flex items-center justify-center p-8 rounded-2xl bg-primary/5 border border-primary/10 aspect-video group hover:bg-primary/10 transition-colors">
-                            <h3 className="text-2xl font-bold text-primary group-hover:scale-105 transition-transform">{project}</h3>
-                        </div>
+                    ].map((project, idx) => (
+                        <motion.div
+                            key={project}
+                            variants={scaleIn}
+                            whileHover={{ scale: 1.05, y: -5 }}
+                            className="flex items-center justify-center p-8 rounded-2xl bg-primary/5 border border-primary/10 aspect-video group hover:bg-primary/10 transition-colors cursor-default"
+                        >
+                            <h3 className="text-2xl font-bold text-primary">{project}</h3>
+                        </motion.div>
                     ))}
-                </div>
-            </section>
+                </motion.div>
+            </AnimatedSection>
 
             {/* CI Introduction */}
-            <section className="mb-32">
-                <h2 className="text-3xl font-bold mb-12 text-center">CI 소개</h2>
-                <div className="grid md:grid-cols-3 gap-8">
-                    <div className="space-y-4 p-8 bg-muted/30 rounded-2xl border border-border/50 text-center hover:bg-muted/50 transition-colors">
-                        <div className="w-12 h-12 bg-orange-500 rounded-full mx-auto mb-4 shadow-lg shadow-orange-500/20" />
-                        <h3 className="text-xl font-bold">상징 : 태양</h3>
-                        <p className="text-muted-foreground">미래 한국의 에너지를 만들어내는 발전소<br />(The Powerhouse of Future Korea)</p>
-                    </div>
-                    <div className="space-y-4 p-8 bg-muted/30 rounded-2xl border border-border/50 text-center hover:bg-muted/50 transition-colors">
-                        <div className="w-12 h-12 bg-teal-500 rounded-full mx-auto mb-4 shadow-lg shadow-teal-500/20" />
-                        <h3 className="text-xl font-bold">색상 : 청록</h3>
-                        <p className="text-muted-foreground">파란색(가능성, 비전)과 초록색(희망, 도전) 혼합<br />→ 청록색(미래에 대한 희망과 확신)</p>
-                    </div>
-                    <div className="space-y-4 p-8 bg-muted/30 rounded-2xl border border-border/50 text-center hover:bg-muted/50 transition-colors">
-                        <div className="w-12 h-12 bg-primary rounded-full mx-auto mb-4 shadow-lg shadow-primary/20 flex items-center justify-center text-white font-bold text-xs">3Y</div>
-                        <h3 className="text-xl font-bold">3Y</h3>
-                        <p className="text-muted-foreground">Liberty, Energy, Harmony<br />청년의 자유로운 사고와 창의적인 에너지로 조화로운 국가발전에 이바지</p>
-                    </div>
-                </div>
-            </section>
+            <AnimatedSection className="mb-32">
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12 text-center">CI 소개</motion.h2>
+                <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-8">
+                    {[
+                        { color: "bg-orange-500", shadow: "shadow-orange-500/20", title: "상징 : 태양", desc: "미래 한국의 에너지를 만들어내는 발전소\n(The Powerhouse of Future Korea)" },
+                        { color: "bg-teal-500", shadow: "shadow-teal-500/20", title: "색상 : 청록", desc: "파란색(가능성, 비전)과 초록색(희망, 도전) 혼합\n→ 청록색(미래에 대한 희망과 확신)" },
+                        { color: "bg-primary", shadow: "shadow-primary/20", title: "3Y", desc: "Liberty, Energy, Harmony\n청년의 자유로운 사고와 창의적인 에너지로 조화로운 국가발전에 이바지", label: "3Y" }
+                    ].map((item, idx) => (
+                        <motion.div
+                            key={idx}
+                            variants={scaleIn}
+                            whileHover={{ y: -5 }}
+                            className="space-y-4 p-8 bg-muted/30 rounded-2xl border border-border/50 text-center hover:bg-muted/50 transition-colors"
+                        >
+                            <div className={`w-12 h-12 ${item.color} rounded-full mx-auto mb-4 shadow-lg ${item.shadow} flex items-center justify-center text-white font-bold text-xs`}>
+                                {item.label || ""}
+                            </div>
+                            <h3 className="text-xl font-bold">{item.title}</h3>
+                            <p className="text-muted-foreground whitespace-pre-line">{item.desc}</p>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </AnimatedSection>
 
             {/* History */}
-            <section>
-                <h2 className="text-3xl font-bold mb-12 text-center">연혁</h2>
+            <AnimatedSection>
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12 text-center">연혁</motion.h2>
                 <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-muted-foreground/20 before:to-transparent">
                     {HISTORY_ITEMS.map((period, idx) => (
-                        <div key={idx} className="relative flex items-start md:justify-normal md:odd:flex-row-reverse group">
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.5, delay: idx * 0.1 }}
+                            className="relative flex items-start md:justify-normal md:odd:flex-row-reverse group"
+                        >
                             <div className="flex items-center justify-center w-10 h-10 rounded-full border border-background bg-muted shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 mt-1">
                                 <div className="w-3 h-3 bg-primary rounded-full" />
                             </div>
@@ -205,10 +244,10 @@ export default function AboutPage() {
                                     ))}
                                 </ul>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
-            </section>
+            </AnimatedSection>
         </div>
     );
 }
