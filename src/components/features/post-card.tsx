@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -13,14 +12,14 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
     // Determine the correct path based on categories
     const basePath = post.categories?.includes('activity') ? '/activities' : '/news';
-    
+
     return (
-        <Link href={`${basePath}/${post.slug.current}`} className="group h-full block">
+        <Link href={`${basePath}/${post.slug}`} className="group h-full block">
             <Card className="h-full overflow-hidden border-none shadow-none bg-transparent transition-colors hover:bg-muted/50">
                 <div className="relative aspect-[1.6/1] w-full overflow-hidden rounded-lg bg-muted">
                     {post.mainImage ? (
                         <Image
-                            src={urlFor(post.mainImage).width(800).height(500).url()}
+                            src={post.mainImage}
                             alt={post.title}
                             fill
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -38,10 +37,14 @@ export function PostCard({ post }: PostCardProps) {
                                 {cat}
                             </span>
                         ))}
-                        <span>•</span>
-                        <time dateTime={post.publishedAt}>
-                            {format(new Date(post.publishedAt), "PPP", { locale: ko })}
-                        </time>
+                        {post.publishedAt && (
+                            <>
+                                <span>•</span>
+                                <time dateTime={post.publishedAt}>
+                                    {format(new Date(post.publishedAt), "PPP", { locale: ko })}
+                                </time>
+                            </>
+                        )}
                     </div>
                     <h3 className="text-xl font-bold leading-tight group-hover:text-primary transition-colors">
                         {post.title}

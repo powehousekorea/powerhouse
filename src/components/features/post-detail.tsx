@@ -1,17 +1,17 @@
 import Image from "next/image";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { urlFor } from "@/sanity/lib/image";
-import type { Post, PortableTextBlock } from "@/types/post";
+import type { Post } from "@/types/post";
 
 type PostType = "activity" | "news";
 
 interface PostDetailProps {
   post: Post;
   type: PostType;
+  content?: React.ReactNode; // MDX 렌더링된 콘텐츠
 }
 
-export function PostDetail({ post, type }: PostDetailProps) {
+export function PostDetail({ post, type, content }: PostDetailProps) {
   const hasValidDate =
     post.publishedAt &&
     typeof post.publishedAt === "string" &&
@@ -38,7 +38,7 @@ export function PostDetail({ post, type }: PostDetailProps) {
           )}
           <span>•</span>
           {hasValidDate && (
-            <time dateTime={post.publishedAt}>
+            <time dateTime={post.publishedAt!}>
               {format(new Date(post.publishedAt as string), "PPP", {
                 locale: ko,
               })}
@@ -57,11 +57,11 @@ export function PostDetail({ post, type }: PostDetailProps) {
         )}
       </div>
 
-      {/* News main image */}
-      {type === "news" && post.mainImage && (
+      {/* Main image */}
+      {post.mainImage && (
         <div className="relative aspect-video w-full overflow-hidden rounded-xl mb-12 bg-muted">
           <Image
-            src={urlFor(post.mainImage).width(1200).height(675).url()}
+            src={post.mainImage}
             alt={post.title}
             fill
             className="object-cover"
@@ -70,40 +70,10 @@ export function PostDetail({ post, type }: PostDetailProps) {
         </div>
       )}
 
-      {/* Body */}
+      {/* Body - MDX Content */}
       <div className="prose prose-lg dark:prose-invert mx-auto">
-        {post.body && (
-          <div className="space-y-4">
-            {post.body.map((block: PortableTextBlock, index: number) => {
-              if (type === "activity" && block._type === "image") {
-                // 활동 상세 페이지의 이미지 렌더링 방식 유지
-                return (
-                  <div
-                    key={block._key || index}
-                    className="relative aspect-video w-full overflow-hidden rounded-lg my-8"
-                  >
-                    <Image
-                      src={urlFor(block).url()}
-                      alt="Activity image"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                );
-              }
-
-              // 기본 텍스트 블록 렌더링 (활동/뉴스 공통)
-              return (
-                <p key={block._key || index} className="leading-relaxed">
-                  {block.children?.map((child) => child.text).join("")}
-                </p>
-              );
-            })}
-          </div>
-        )}
+        {content}
       </div>
     </article>
   );
 }
-
-

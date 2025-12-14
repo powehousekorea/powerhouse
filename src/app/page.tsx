@@ -1,21 +1,19 @@
 import { HeroSection } from "@/components/features/hero-section";
-import { client } from "@/sanity/lib/client";
-import { ACTIVITIES_QUERY, LATEST_NEWS_QUERY } from "@/sanity/lib/queries";
+import { getActivityPosts, getLatestNews } from "@/lib/keystatic";
 import { PostCard } from "@/components/features/post-card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import type { Post } from "@/types/post";
 
 export const revalidate = 60;
 
 export default async function Home() {
   const [activities, news] = await Promise.all([
-    client.fetch(ACTIVITIES_QUERY),
-    client.fetch(LATEST_NEWS_QUERY),
+    getActivityPosts(),
+    getLatestNews(3),
   ]);
 
-  const latestActivities: Post[] = activities.slice(0, 7);
-  const latestNews: Post[] = news.slice(0, 3);
+  const latestActivities = activities.slice(0, 7);
+  const latestNews = news;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -72,7 +70,7 @@ export default async function Home() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
             {latestActivities.map((post) => (
-              <PostCard key={post._id} post={post} />
+              <PostCard key={post.slug} post={post} />
             ))}
           </div>
 
@@ -124,7 +122,7 @@ export default async function Home() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
             {latestNews.map((post) => (
-              <PostCard key={post._id} post={post} />
+              <PostCard key={post.slug} post={post} />
             ))}
           </div>
 

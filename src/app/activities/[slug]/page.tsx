@@ -1,5 +1,4 @@
-import { client } from "@/sanity/lib/client";
-import { POST_QUERY } from "@/sanity/lib/queries";
+import { reader } from "@/lib/keystatic";
 import { notFound } from "next/navigation";
 import { PostDetail } from "@/components/features/post-detail";
 
@@ -9,14 +8,37 @@ interface PageProps {
     params: Promise<{ slug: string }>;
 }
 
+export async function generateStaticParams() {
+    const posts = await reader.collections.posts.all();
+    return posts
+        .filter((post) => post.entry.categories.includes('activity'))
+        .map((post) => ({
+            slug: post.slug,
+        }));
+}
+
 export default async function ActivityPage({ params }: PageProps) {
     const { slug: encodedSlug } = await params;
     const slug = decodeURIComponent(encodedSlug);
-    const post = await client.fetch(POST_QUERY, { slug });
+    const post = await reader.collections.posts.read(slug);
 
     if (!post) {
         notFound();
     }
 
-    return <PostDetail post={post} type="activity" />;
+    // MDX 콘텐츠 렌더링
+    const { default: Content } = await import(`../../../../content/posts/${slug}/index.mdx`).catch(() => ({
+        default: () => null
+    }));
+
+    const postData = {
+        slug,
+        title: post.title,
+        mainImage: post.mainImage,
+        categories: post.categories,
+        publishedAt: post.publishedAt,
+        summary: post.summary,
+    };
+
+    return <PostDetail post={postData} type="activity" content={<Content />} />;
 }

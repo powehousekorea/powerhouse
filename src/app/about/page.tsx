@@ -60,7 +60,7 @@ const HISTORY_ITEMS = [
 
 export default function AboutPage() {
     return (
-        <div className="container mx-auto px-4 py-16 max-w-5xl">
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
             {/* Intro Section */}
             <div className="text-center mb-24 space-y-8">
                 <div className="space-y-4">

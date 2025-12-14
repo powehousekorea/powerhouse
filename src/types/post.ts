@@ -1,35 +1,27 @@
-export interface SanityImage {
-  _type: "image";
-  asset: {
-    _type: "reference";
-    _ref: string;
-  };
-  [key: string]: unknown;
-}
-
-export interface PortableTextChild {
-  _key?: string;
-  _type?: string;
-  text: string;
-  [key: string]: unknown;
-}
-
-export interface PortableTextBlock {
-  _key?: string;
-  _type: string;
-  children?: PortableTextChild[];
-  [key: string]: unknown;
-}
-
+// Keystatic용 Post 타입 정의
 export interface Post {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  mainImage?: SanityImage;
-  publishedAt?: string;
-  summary?: string;
-  categories?: string[];
-  body?: PortableTextBlock[];
+  slug: string
+  title: string
+  mainImage: string | null
+  categories: readonly ('news' | 'activity')[]
+  publishedAt: string | null
+  summary: string | null
+  body?: string // MDX content
 }
 
+export interface Person {
+  slug: string
+  name: string
+  role: string | null
+  image: string | null
+  bio: string | null
+}
 
+export interface LinkCard {
+  slug: string
+  title: string
+  url: string
+  description: string | null
+  thumbnail: string | null
+  publishedAt: string | null
+}

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function JoinPage() {
     return (
-        <div className="container mx-auto px-4 py-20 max-w-4xl">
+        <div className="container mx-auto px-4 py-20 max-w-6xl">
             <div className="text-center mb-16">
                 <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6">
                     Join Us

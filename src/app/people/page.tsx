@@ -105,7 +105,7 @@ function PersonCard({ person }: { person: { name: string, role: string, bio: str
 
 export default function PeoplePage() {
     return (
-        <div className="container mx-auto px-4 py-16 max-w-5xl">
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
             <div className="mb-20 text-center space-y-6">
                 <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
                     청연과 함께하는 사람들
