@@ -5,7 +5,16 @@
       "Bash(npm uninstall:*)",
       "Bash(npm run build:*)",
       "Bash(git config:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(npm run migrate:*)",
+      "Bash(grep:*)",
+      "Bash(timeout 20 npm run dev:*)",
+      "Bash(npx tsx:*)",
+      "Bash(for file in content/posts/2025*/index.mdx)",
+      "Bash(do sed -i 's/categories: \\\\[\"\"news\"\"\\\\]/categories:\\\\n  - news/g; s/categories: \\\\[\"\"activity\"\"\\\\]/categories:\\\\n  - activity/g' \"$file\")",
+      "Bash(done)",
+      "Bash(node --loader tsx:*)"
     ]
   }
 }

@@ -20,12 +20,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ActivityPage({ params }: PageProps) {
     const { slug } = await params;
-    const result = await getPostDetail(slug);
+    const decodedSlug = decodeURIComponent(slug);
+    const result = await getPostDetail(decodedSlug);
 
     if (!result) {
         notFound();
     }
 
     const { post, Content } = result;
-    return <PostDetail post={post} type="activity" content={<Content />} />;
+    return <PostDetail post={post} type="activity" content={Content} />;
 }
