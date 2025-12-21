@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MobileMenu } from "./mobile-menu";
 
 const LOGO_PATH = "/logo.png";
 
@@ -48,6 +49,8 @@ export function Header() {
         };
     }, [isMobileMenuOpen]);
 
+    const isHomePage = pathname === "/";
+
     return (
         <>
             <motion.header
@@ -76,7 +79,7 @@ export function Header() {
                                 height={50}
                                 className={cn(
                                     "h-10 w-auto object-contain transition-all duration-300",
-                                    !isScrolled && pathname === "/" && "brightness-0 invert"
+                                    !isScrolled && isHomePage && "brightness-0 invert"
                                 )}
                                 priority
                             />
@@ -95,7 +98,7 @@ export function Header() {
                                         "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
                                         isActive
                                             ? "text-primary"
-                                            : isScrolled || pathname !== "/"
+                                            : isScrolled || !isHomePage
                                                 ? "text-foreground/70 hover:text-foreground hover:bg-muted"
                                                 : "text-white/80 hover:text-white hover:bg-white/10"
                                     )}
@@ -116,7 +119,7 @@ export function Header() {
                                 href="/join"
                                 className={cn(
                                     "ml-4 px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300",
-                                    isScrolled || pathname !== "/"
+                                    isScrolled || !isHomePage
                                         ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
                                         : "bg-white text-slate-900 hover:bg-white/90"
                                 )}
@@ -132,7 +135,7 @@ export function Header() {
                             "md:hidden relative z-10 p-2 rounded-full transition-colors",
                             isMobileMenuOpen
                                 ? "text-foreground"
-                                : isScrolled || pathname !== "/"
+                                : isScrolled || !isHomePage
                                     ? "text-foreground hover:bg-muted"
                                     : "text-white hover:bg-white/10"
                         )}
@@ -167,76 +170,12 @@ export function Header() {
                 </div>
             </motion.header>
 
-            {/* Mobile Menu Overlay */}
-            <AnimatePresence>
-                {isMobileMenuOpen && (
-                    <motion.div
-                        className="fixed inset-0 z-40 md:hidden"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {/* Backdrop */}
-                        <motion.div
-                            className="absolute inset-0 bg-background/95 backdrop-blur-xl"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                        />
-
-                        {/* Menu Content */}
-                        <nav className="relative flex flex-col items-center justify-center h-full gap-2 px-4">
-                            {navItems.map((item, index) => {
-                                const isActive = pathname === item.href;
-                                return (
-                                    <motion.div
-                                        key={item.href}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 20 }}
-                                        transition={{
-                                            duration: 0.3,
-                                            delay: index * 0.1,
-                                            ease: [0.25, 0.1, 0.25, 1],
-                                        }}
-                                    >
-                                        <Link
-                                            href={item.href}
-                                            className={cn(
-                                                "block px-8 py-4 text-2xl font-medium rounded-2xl transition-all duration-300",
-                                                isActive
-                                                    ? "text-primary bg-primary/10"
-                                                    : "text-foreground/70 hover:text-foreground hover:bg-muted"
-                                            )}
-                                        >
-                                            {item.label}
-                                        </Link>
-                                    </motion.div>
-                                );
-                            })}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 20 }}
-                                transition={{
-                                    duration: 0.3,
-                                    delay: navItems.length * 0.1,
-                                    ease: [0.25, 0.1, 0.25, 1],
-                                }}
-                                className="mt-4"
-                            >
-                                <Link
-                                    href="/join"
-                                    className="block px-12 py-4 text-xl font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                                >
-                                    함께하기
-                                </Link>
-                            </motion.div>
-                        </nav>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Mobile Menu */}
+            <MobileMenu
+                isOpen={isMobileMenuOpen}
+                navItems={navItems}
+                pathname={pathname}
+            />
         </>
     );
 }

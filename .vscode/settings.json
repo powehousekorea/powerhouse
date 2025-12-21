@@ -1,0 +1,4 @@
+{
+  "git.openAfterClone": "always",
+  "git.fetchOnPull": true
+}

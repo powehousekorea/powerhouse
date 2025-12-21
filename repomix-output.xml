@@ -40,92 +40,325 @@ The content is organized as follows:
 </file_summary>
 
 <directory_structure>
-web/.gitignore
-web/eslint.config.mjs
-web/migration/ghost.json
-web/migration/migrate.ts
-web/next.config.ts
-web/package.json
-web/postcss.config.mjs
-web/public/file.svg
-web/public/globe.svg
-web/public/next.svg
-web/public/vercel.svg
-web/public/window.svg
-web/README.md
-web/sanity.cli.ts
-web/sanity.config.ts
-web/src/app/(studio)/layout.tsx
-web/src/app/(studio)/studio/[[...tool]]/page.tsx
-web/src/app/about/page.tsx
-web/src/app/api/og/route.ts
-web/src/app/blog/[slug]/page.tsx
-web/src/app/blog/page.tsx
-web/src/app/favicon.ico
-web/src/app/globals.css
-web/src/app/insights/page.tsx
-web/src/app/layout.tsx
-web/src/app/media/page.tsx
-web/src/app/page.tsx
-web/src/components/features/BlogCard.tsx
-web/src/components/features/LinkCard.tsx
-web/src/components/features/PostList.tsx
-web/src/components/layout/Footer.tsx
-web/src/components/layout/Header.tsx
-web/src/sanity/components/UrlInput.tsx
-web/src/sanity/env.ts
-web/src/sanity/lib/client.ts
-web/src/sanity/lib/image.ts
-web/src/sanity/lib/queries.ts
-web/src/sanity/schemaTypes/authorType.ts
-web/src/sanity/schemaTypes/categoryType.ts
-web/src/sanity/schemaTypes/index.ts
-web/src/sanity/schemaTypes/linkType.ts
-web/src/sanity/schemaTypes/postType.ts
-web/src/sanity/structure.ts
-web/tsconfig.json
+.claude/settings.local.json
+.gitignore
+components.json
+content/link-cards/sample-link.json
+content/people/sample-person.json
+content/posts/sample-activity-post/index.mdx
+content/posts/sample-news-post/index.mdx
+env.example
+eslint.config.mjs
+keystatic.config.ts
+mdx-components.tsx
+next.config.ts
+package.json
+postcss.config.mjs
+public/file.svg
+public/globe.svg
+public/logo.png
+public/next.svg
+public/vercel.svg
+public/window.svg
+README.md
+src/app/about/page.tsx
+src/app/activities/[slug]/page.tsx
+src/app/activities/page.tsx
+src/app/api/keystatic/[...params]/route.ts
+src/app/favicon.ico
+src/app/globals.css
+src/app/join/page.tsx
+src/app/keystatic/[[...params]]/page.tsx
+src/app/keystatic/keystatic.tsx
+src/app/keystatic/layout.tsx
+src/app/layout.tsx
+src/app/news/[slug]/page.tsx
+src/app/news/page.tsx
+src/app/page.tsx
+src/app/people/page.tsx
+src/components/features/activities-section.tsx
+src/components/features/cta-section.tsx
+src/components/features/hero-section.tsx
+src/components/features/impact-section.tsx
+src/components/features/news-section.tsx
+src/components/features/post-card.tsx
+src/components/features/post-detail.tsx
+src/components/features/post-list-page.tsx
+src/components/features/section-wrapper.tsx
+src/components/layout/footer.tsx
+src/components/layout/header.tsx
+src/components/layout/mobile-menu.tsx
+src/components/ui/button.tsx
+src/components/ui/card.tsx
+src/lib/animations.ts
+src/lib/keystatic.ts
+src/lib/post-utils.ts
+src/lib/utils.ts
+src/types/post.ts
+tsconfig.json
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
 
-<file path="web/src/app/media/page.tsx">
-import { client } from '@/sanity/lib/client'
-import { LINKS_QUERY } from '@/sanity/lib/queries'
-import { LinkCard } from '@/components/features/LinkCard'
+<file path="src/components/features/post-list-page.tsx">
+import { PostCard } from "@/components/features/post-card";
+import type { Post } from "@/types/post";
 
-export const revalidate = 60
+interface PostListPageProps {
+    title: string;
+    subtitle: string[];
+    emptyMessage: string;
+    posts: Post[];
+}
 
-export default async function MediaPage() {
-    const links = await client.fetch(LINKS_QUERY)
-
+export function PostListPage({ title, subtitle, emptyMessage, posts }: PostListPageProps) {
     return (
-        <main className="flex flex-col gap-12 py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
-            {/* Header */}
-            <header className="flex flex-col gap-4">
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground">Media</h1>
-                <p className="text-lg text-secondary">뉴스 기사 및 언론 보도</p>
-            </header>
-
-            {/* Links Grid */}
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {links.map((link: any) => (
-                    <LinkCard key={link._id} link={link} />
-                ))}
-            </section>
-
-            {/* Empty State */}
-            {links.length === 0 && (
-                <div className="text-center py-12 text-secondary">
-                    아직 등록된 미디어가 없습니다.
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
+            <div className="mb-20 text-center space-y-6">
+                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
+                    {title}
+                </h1>
+                <div className="space-y-2 text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+                    {subtitle.map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
                 </div>
-            )}
-        </main>
-    )
+            </div>
+
+            <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {posts.length > 0 ? (
+                    posts.map((post) => (
+                        <PostCard key={post.slug} post={post} />
+                    ))
+                ) : (
+                    <div className="col-span-full text-center py-20 text-muted-foreground">
+                        {emptyMessage}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
 </file>
 
-<file path="web/.gitignore">
+<file path="src/components/layout/mobile-menu.tsx">
+"use client";
+
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+interface NavItem {
+    href: string;
+    label: string;
+}
+
+interface MobileMenuProps {
+    isOpen: boolean;
+    navItems: NavItem[];
+    pathname: string;
+}
+
+export function MobileMenu({ isOpen, navItems, pathname }: MobileMenuProps) {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    className="fixed inset-0 z-40 md:hidden"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    {/* Backdrop */}
+                    <motion.div
+                        className="absolute inset-0 bg-background/95 backdrop-blur-xl"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    />
+
+                    {/* Menu Content */}
+                    <nav className="relative flex flex-col items-center justify-center h-full gap-2 px-4">
+                        {navItems.map((item, index) => {
+                            const isActive = pathname === item.href;
+                            return (
+                                <motion.div
+                                    key={item.href}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    transition={{
+                                        duration: 0.3,
+                                        delay: index * 0.1,
+                                        ease: [0.25, 0.1, 0.25, 1],
+                                    }}
+                                >
+                                    <Link
+                                        href={item.href}
+                                        className={cn(
+                                            "block px-8 py-4 text-2xl font-medium rounded-2xl transition-all duration-300",
+                                            isActive
+                                                ? "text-primary bg-primary/10"
+                                                : "text-foreground/70 hover:text-foreground hover:bg-muted"
+                                        )}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </motion.div>
+                            );
+                        })}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{
+                                duration: 0.3,
+                                delay: navItems.length * 0.1,
+                                ease: [0.25, 0.1, 0.25, 1],
+                            }}
+                            className="mt-4"
+                        >
+                            <Link
+                                href="/join"
+                                className="block px-12 py-4 text-xl font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                            >
+                                함께하기
+                            </Link>
+                        </motion.div>
+                    </nav>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+}
+</file>
+
+<file path="src/lib/post-utils.ts">
+import { reader } from "@/lib/keystatic";
+import type { Post } from "@/types/post";
+import type { Metadata } from "next";
+
+export type PostCategory = "activity" | "news";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://powerhouse.kr";
+
+interface PostDetailResult {
+    post: Post;
+    Content: React.ComponentType;
+}
+
+/**
+ * Fetch post data and MDX content by slug
+ * Handles slug decoding consistently across all post detail pages
+ */
+export async function getPostDetail(slug: string): Promise<PostDetailResult | null> {
+    const post = await reader.collections.posts.read(slug);
+
+    if (!post) {
+        return null;
+    }
+
+    const { default: Content } = await import(`../../content/posts/${slug}/index.mdx`).catch(() => ({
+        default: () => null
+    }));
+
+    const postData: Post = {
+        slug,
+        title: post.title,
+        mainImage: post.mainImage,
+        categories: post.categories,
+        publishedAt: post.publishedAt,
+        summary: post.summary,
+    };
+
+    return { post: postData, Content };
+}
+
+/**
+ * Generate static params for a specific category
+ */
+export async function generatePostStaticParams(category: PostCategory) {
+    const posts = await reader.collections.posts.all();
+    return posts
+        .filter((post) => post.entry.categories.includes(category))
+        .map((post) => ({
+            slug: post.slug,
+        }));
+}
+
+/**
+ * Generate metadata for post detail pages
+ */
+export async function generatePostMetadata(
+    slug: string,
+    category: PostCategory
+): Promise<Metadata> {
+    const post = await reader.collections.posts.read(slug);
+
+    if (!post) {
+        return {
+            title: "게시물을 찾을 수 없습니다",
+        };
+    }
+
+    const basePath = category === "activity" ? "/activities" : "/news";
+    const categoryLabel = category === "activity" ? "활동" : "뉴스";
+
+    return {
+        title: post.title,
+        description: post.summary || `한국청년유권자연맹 ${categoryLabel} - ${post.title}`,
+        openGraph: {
+            title: post.title,
+            description: post.summary || `한국청년유권자연맹 ${categoryLabel}`,
+            type: "article",
+            url: `${SITE_URL}${basePath}/${slug}`,
+            images: post.mainImage
+                ? [
+                    {
+                        url: post.mainImage.startsWith("http")
+                            ? post.mainImage
+                            : `${SITE_URL}${post.mainImage}`,
+                        width: 1200,
+                        height: 630,
+                        alt: post.title,
+                    },
+                ]
+                : undefined,
+            publishedTime: post.publishedAt || undefined,
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: post.title,
+            description: post.summary || `한국청년유권자연맹 ${categoryLabel}`,
+            images: post.mainImage
+                ? [
+                    post.mainImage.startsWith("http")
+                        ? post.mainImage
+                        : `${SITE_URL}${post.mainImage}`,
+                ]
+                : undefined,
+        },
+    };
+}
+</file>
+
+<file path=".claude/settings.local.json">
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run build:*)",
+      "Bash(git config:*)",
+      "Bash(cat:*)"
+    ]
+  }
+}
+</file>
+
+<file path=".gitignore">
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -169,7 +402,107 @@ yarn-error.log*
 next-env.d.ts
 </file>
 
-<file path="web/eslint.config.mjs">
+<file path="components.json">
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/app/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {}
+}
+</file>
+
+<file path="content/link-cards/sample-link.json">
+{
+  "title": "샘플 링크 카드",
+  "url": "https://example.com",
+  "description": "이것은 외부 링크를 위한 샘플 링크 카드입니다. 관련 리소스나 파트너 웹사이트로 연결됩니다.",
+  "thumbnail": "/images/link-cards/sample-thumbnail.jpg",
+  "publishedAt": "2024-12-15T09:00:00.000Z"
+}
+</file>
+
+<file path="content/people/sample-person.json">
+{
+  "name": "홍길동",
+  "role": "대표이사",
+  "image": "/images/people/sample-person.jpg",
+  "bio": "파워하우스 코리아의 대표이사로서 회사의 전략적 방향을 이끌고 있습니다. 20년 이상의 업계 경험을 보유하고 있습니다."
+}
+</file>
+
+<file path="content/posts/sample-activity-post/index.mdx">
+---
+title: 샘플 활동 포스트
+mainImage: /images/posts/sample-activity.jpg
+categories:
+  - activity
+publishedAt: '2024-12-10T09:00:00.000Z'
+summary: 이것은 Keystatic으로 작성된 샘플 활동 포스트입니다. 활동 내용을 담고 있습니다.
+---
+
+# 샘플 활동 포스트
+
+이것은 Keystatic CMS로 작성된 샘플 활동 콘텐츠입니다.
+
+## 활동 내용
+
+파워하우스 코리아의 활동 내용이 여기에 기록됩니다.
+
+### 참가자
+
+- 참가자 1
+- 참가자 2
+- 참가자 3
+
+활동에 대한 상세 설명이 여기에 들어갑니다.
+</file>
+
+<file path="content/posts/sample-news-post/index.mdx">
+---
+title: 샘플 뉴스 포스트
+mainImage: /images/posts/sample-news.jpg
+categories:
+  - news
+publishedAt: '2024-12-15T09:00:00.000Z'
+summary: 이것은 Keystatic으로 작성된 샘플 뉴스 포스트입니다. 테스트용 콘텐츠입니다.
+---
+
+# 샘플 뉴스 포스트
+
+이것은 Keystatic CMS로 작성된 샘플 뉴스 콘텐츠입니다.
+
+## 주요 내용
+
+- 첫 번째 항목
+- 두 번째 항목
+- 세 번째 항목
+
+본문 내용이 여기에 들어갑니다. Keystatic은 MDX 형식을 지원하여 리치 텍스트 콘텐츠를 작성할 수 있습니다.
+</file>
+
+<file path="env.example">
+NEXT_PUBLIC_SANITY_PROJECT_ID=
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2024-11-30
+</file>
+
+<file path="eslint.config.mjs">
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
@@ -190,51 +523,120 @@ const eslintConfig = defineConfig([
 export default eslintConfig;
 </file>
 
-<file path="web/package.json">
-{
-  "name": "web",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+<file path="keystatic.config.ts">
+import { config, fields, collection } from '@keystatic/core'
+
+export default config({
+  storage: {
+    kind: 'local',
   },
-  "dependencies": {
-    "@sanity/block-tools": "^3.70.0",
-    "@sanity/client": "^7.13.1",
-    "@sanity/icons": "^3.7.4",
-    "@sanity/image-url": "^2.0.1",
-    "@sanity/schema": "^4.19.0",
-    "@sanity/ui": "^3.1.11",
-    "@sanity/vision": "^4.19.0",
-    "@types/jsdom": "^27.0.0",
-    "dotenv": "^17.2.3",
-    "jsdom": "^27.2.0",
-    "next": "16.0.5",
-    "next-sanity": "^11.6.10",
-    "open-graph-scraper": "^6.11.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "sanity": "^4.19.0",
-    "styled-components": "^6.1.19"
+  collections: {
+    posts: collection({
+      label: 'Posts',
+      slugField: 'title',
+      path: 'content/posts/*',
+      format: { contentField: 'body' },
+      schema: {
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
+        mainImage: fields.image({
+          label: 'Main Image',
+          directory: 'public/images/posts',
+          publicPath: '/images/posts/',
+        }),
+        categories: fields.multiselect({
+          label: 'Categories',
+          options: [
+            { label: 'News', value: 'news' },
+            { label: 'Activity', value: 'activity' },
+          ],
+        }),
+        publishedAt: fields.datetime({
+          label: 'Published At',
+          defaultValue: { kind: 'now' },
+        }),
+        summary: fields.text({
+          label: 'Summary',
+          multiline: true,
+        }),
+        body: fields.mdx({
+          label: 'Body',
+          options: {
+            image: {
+              directory: 'public/images/posts',
+              publicPath: '/images/posts/',
+            },
+          },
+        }),
+      },
+    }),
+    people: collection({
+      label: 'People',
+      slugField: 'name',
+      path: 'content/people/*',
+      format: { data: 'json' },
+      schema: {
+        name: fields.slug({
+          name: { label: 'Name', validation: { isRequired: true } },
+        }),
+        role: fields.text({
+          label: 'Role',
+        }),
+        image: fields.image({
+          label: 'Image',
+          directory: 'public/images/people',
+          publicPath: '/images/people/',
+        }),
+        bio: fields.text({
+          label: 'Bio',
+          multiline: true,
+        }),
+      },
+    }),
+    linkCards: collection({
+      label: 'Link Cards',
+      slugField: 'title',
+      path: 'content/link-cards/*',
+      format: { data: 'json' },
+      schema: {
+        title: fields.slug({
+          name: { label: 'Title', validation: { isRequired: true } },
+        }),
+        url: fields.url({
+          label: 'URL',
+          validation: { isRequired: true },
+        }),
+        description: fields.text({
+          label: 'Description',
+          multiline: true,
+        }),
+        thumbnail: fields.image({
+          label: 'Thumbnail',
+          directory: 'public/images/link-cards',
+          publicPath: '/images/link-cards/',
+        }),
+        publishedAt: fields.datetime({
+          label: 'Published At',
+          defaultValue: { kind: 'now' },
+        }),
+      },
+    }),
   },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.5",
-    "tailwindcss": "^4",
-    "tsx": "^4.20.6",
-    "typescript": "^5"
+})
+</file>
+
+<file path="mdx-components.tsx">
+import type { MDXComponents } from 'mdx/types'
+
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    ...components,
   }
 }
 </file>
 
-<file path="web/postcss.config.mjs">
+<file path="postcss.config.mjs">
 const config = {
   plugins: {
     "@tailwindcss/postcss": {},
@@ -244,27 +646,27 @@ const config = {
 export default config;
 </file>
 
-<file path="web/public/file.svg">
+<file path="public/file.svg">
 <svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clip-rule="evenodd" fill="#666" fill-rule="evenodd"/></svg>
 </file>
 
-<file path="web/public/globe.svg">
+<file path="public/globe.svg">
 <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.27 14.1a6.5 6.5 0 0 0 3.67-3.45q-1.24.21-2.7.34-.31 1.83-.97 3.1M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.48-1.52a7 7 0 0 1-.96 0H7.5a4 4 0 0 1-.84-1.32q-.38-.89-.63-2.08a40 40 0 0 0 3.92 0q-.25 1.2-.63 2.08a4 4 0 0 1-.84 1.31zm2.94-4.76q1.66-.15 2.95-.43a7 7 0 0 0 0-2.58q-1.3-.27-2.95-.43a18 18 0 0 1 0 3.44m-1.27-3.54a17 17 0 0 1 0 3.64 39 39 0 0 1-4.3 0 17 17 0 0 1 0-3.64 39 39 0 0 1 4.3 0m1.1-1.17q1.45.13 2.69.34a6.5 6.5 0 0 0-3.67-3.44q.65 1.26.98 3.1M8.48 1.5l.01.02q.41.37.84 1.31.38.89.63 2.08a40 40 0 0 0-3.92 0q.25-1.2.63-2.08a4 4 0 0 1 .85-1.32 7 7 0 0 1 .96 0m-2.75.4a6.5 6.5 0 0 0-3.67 3.44 29 29 0 0 1 2.7-.34q.31-1.83.97-3.1M4.58 6.28q-1.66.16-2.95.43a7 7 0 0 0 0 2.58q1.3.27 2.95.43a18 18 0 0 1 0-3.44m.17 4.71q-1.45-.12-2.69-.34a6.5 6.5 0 0 0 3.67 3.44q-.65-1.27-.98-3.1" fill="#666"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
 </file>
 
-<file path="web/public/next.svg">
+<file path="public/next.svg">
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 394 80"><path fill="#000" d="M262 0h68.5v12.7h-27.2v66.6h-13.6V12.7H262V0ZM149 0v12.7H94v20.4h44.3v12.6H94v21h55v12.6H80.5V0h68.7zm34.3 0h-17.8l63.8 79.4h17.9l-32-39.7 32-39.6h-17.9l-23 28.6-23-28.6zm18.3 56.7-9-11-27.1 33.7h17.8l18.3-22.7z"/><path fill="#000" d="M81 79.3 17 0H0v79.3h13.6V17l50.2 62.3H81Zm252.6-.4c-1 0-1.8-.4-2.5-1s-1.1-1.6-1.1-2.6.3-1.8 1-2.5 1.6-1 2.6-1 1.8.3 2.5 1a3.4 3.4 0 0 1 .6 4.3 3.7 3.7 0 0 1-3 1.8zm23.2-33.5h6v23.3c0 2.1-.4 4-1.3 5.5a9.1 9.1 0 0 1-3.8 3.5c-1.6.8-3.5 1.3-5.7 1.3-2 0-3.7-.4-5.3-1s-2.8-1.8-3.7-3.2c-.9-1.3-1.4-3-1.4-5h6c.1.8.3 1.6.7 2.2s1 1.2 1.6 1.5c.7.4 1.5.5 2.4.5 1 0 1.8-.2 2.4-.6a4 4 0 0 0 1.6-1.8c.3-.8.5-1.8.5-3V45.5zm30.9 9.1a4.4 4.4 0 0 0-2-3.3 7.5 7.5 0 0 0-4.3-1.1c-1.3 0-2.4.2-3.3.5-.9.4-1.6 1-2 1.6a3.5 3.5 0 0 0-.3 4c.3.5.7.9 1.3 1.2l1.8 1 2 .5 3.2.8c1.3.3 2.5.7 3.7 1.2a13 13 0 0 1 3.2 1.8 8.1 8.1 0 0 1 3 6.5c0 2-.5 3.7-1.5 5.1a10 10 0 0 1-4.4 3.5c-1.8.8-4.1 1.2-6.8 1.2-2.6 0-4.9-.4-6.8-1.2-2-.8-3.4-2-4.5-3.5a10 10 0 0 1-1.7-5.6h6a5 5 0 0 0 3.5 4.6c1 .4 2.2.6 3.4.6 1.3 0 2.5-.2 3.5-.6 1-.4 1.8-1 2.4-1.7a4 4 0 0 0 .8-2.4c0-.9-.2-1.6-.7-2.2a11 11 0 0 0-2.1-1.4l-3.2-1-3.8-1c-2.8-.7-5-1.7-6.6-3.2a7.2 7.2 0 0 1-2.4-5.7 8 8 0 0 1 1.7-5 10 10 0 0 1 4.3-3.5c2-.8 4-1.2 6.4-1.2 2.3 0 4.4.4 6.2 1.2 1.8.8 3.2 2 4.3 3.4 1 1.4 1.5 3 1.5 5h-5.8z"/></svg>
 </file>
 
-<file path="web/public/vercel.svg">
+<file path="public/vercel.svg">
 <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1155 1000"><path d="m577.3 0 577.4 1000H0z" fill="#fff"/></svg>
 </file>
 
-<file path="web/public/window.svg">
+<file path="public/window.svg">
 <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.5h13v10a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1zM0 1h16v11.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 0 12.5zm3.75 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M7 4.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5" fill="#666"/></svg>
 </file>
 
-<file path="web/README.md">
+<file path="README.md">
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -303,192 +705,1127 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 </file>
 
-<file path="web/sanity.cli.ts">
-/**
-* This configuration file lets you run `$ sanity [command]` in this folder
-* Go to https://www.sanity.io/docs/cli to learn more.
-**/
-import { defineCliConfig } from 'sanity/cli'
+<file path="src/app/api/keystatic/[...params]/route.ts">
+import { makeRouteHandler } from '@keystatic/next/route-handler'
+import config from '../../../../../keystatic.config'
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
-
-export default defineCliConfig({ api: { projectId, dataset } })
-</file>
-
-<file path="web/sanity.config.ts">
-'use client'
-
-/**
- * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
- */
-
-import {visionTool} from '@sanity/vision'
-import {defineConfig} from 'sanity'
-import {structureTool} from 'sanity/structure'
-
-// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
-import {apiVersion, dataset, projectId} from './src/sanity/env'
-import {schema} from './src/sanity/schemaTypes'
-import {structure} from './src/sanity/structure'
-
-export default defineConfig({
-  basePath: '/studio',
-  projectId,
-  dataset,
-  // Add and edit the content schema in the './sanity/schemaTypes' folder
-  schema,
-  plugins: [
-    structureTool({structure}),
-    // Vision is a tool that lets you query your content with GROQ in the studio
-    // https://www.sanity.io/docs/the-vision-plugin
-    visionTool({defaultApiVersion: apiVersion}),
-  ],
+export const { POST, GET } = makeRouteHandler({
+  config,
 })
 </file>
 
-<file path="web/src/app/(studio)/layout.tsx">
-export default function StudioLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
-    return <>{children}</>
+<file path="src/app/keystatic/[[...params]]/page.tsx">
+export { default } from '../keystatic'
+</file>
+
+<file path="src/app/keystatic/keystatic.tsx">
+'use client'
+
+import { makePage } from '@keystatic/next/ui/app'
+import config from '../../../keystatic.config'
+
+export default makePage(config)
+</file>
+
+<file path="src/app/keystatic/layout.tsx">
+import KeystaticApp from './keystatic'
+
+export default function KeystaticLayout() {
+  return <KeystaticApp />
 }
 </file>
 
-<file path="web/src/app/(studio)/studio/[[...tool]]/page.tsx">
-/**
- * This route is responsible for the built-in authoring environment using Sanity Studio.
- * All routes under your studio path is handled by this file using Next.js's catch-all routes:
- * https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes
- *
- * You can learn more about the next-sanity package here:
- * https://github.com/sanity-io/next-sanity
- */
+<file path="src/components/features/activities-section.tsx">
+"use client";
 
-import { NextStudio } from 'next-sanity/studio'
-import config from '../../../../../sanity.config'
+import { useRef } from "react";
+import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { PostCard } from "./post-card";
+import { fadeInUp, staggerContainer } from "@/lib/animations";
+import type { Post } from "@/types/post";
 
-export const dynamic = 'force-static'
-
-export { metadata, viewport } from 'next-sanity/studio'
-
-export default function StudioPage() {
-    return <NextStudio config={config} />
+interface ActivitiesSectionProps {
+    posts: Post[];
 }
-</file>
 
-<file path="web/src/app/api/og/route.ts">
-import { NextResponse } from 'next/server';
-import ogs from 'open-graph-scraper';
-
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const url = searchParams.get('url');
-
-    if (!url) {
-        return NextResponse.json({ error: 'URL is required' }, { status: 400 });
-    }
-
-    try {
-        const { result } = await ogs({ url });
-
-        return NextResponse.json({
-            title: result.ogTitle || result.twitterTitle || '',
-            description: result.ogDescription || result.twitterDescription || '',
-            image: result.ogImage?.[0]?.url || result.twitterImage?.[0]?.url || '',
-        });
-    } catch (error) {
-        console.error('OG Scraping Error:', error);
-        return NextResponse.json({ error: 'Failed to fetch metadata' }, { status: 500 });
-    }
-}
-</file>
-
-<file path="web/src/app/blog/page.tsx">
-import { client } from "@/sanity/lib/client";
-import { POSTS_QUERY } from "@/sanity/lib/queries";
-import { BlogCard } from "@/components/features/BlogCard";
-
-export const revalidate = 60;
-
-export default async function BlogPage() {
-    const posts = await client.fetch(POSTS_QUERY);
+export function ActivitiesSection({ posts }: ActivitiesSectionProps) {
+    const sectionRef = useRef(null);
+    const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
     return (
-        <main className="py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto w-full">
-            <div className="flex flex-col gap-12">
-                <div className="flex flex-col gap-4 border-b border-gray-100 pb-8">
-                    <h1 className="text-4xl font-bold tracking-tight text-primary">Blog</h1>
-                    <p className="text-lg text-secondary max-w-2xl">
-                        Thoughts on technology, leadership, and building products that matter.
-                    </p>
+        <section
+            ref={sectionRef}
+            className="relative py-24 bg-background"
+        >
+            <div className="container mx-auto px-4 max-w-6xl">
+                {/* Section Header */}
+                <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate={isInView ? "visible" : "hidden"}
+                    className="text-center mb-16"
+                >
+                    <motion.span
+                        variants={fadeInUp}
+                        className="inline-block text-primary font-medium text-sm tracking-wider uppercase mb-4"
+                    >
+                        Activities
+                    </motion.span>
+                    <motion.h2
+                        variants={fadeInUp}
+                        className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                    >
+                        청연 활동
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">
+                            {" "}소식
+                        </span>
+                    </motion.h2>
+                    <motion.p
+                        variants={fadeInUp}
+                        className="text-muted-foreground text-lg max-w-2xl mx-auto"
+                    >
+                        한국청년유권자연맹의 최근 활동을 확인해보세요.
+                    </motion.p>
+                </motion.div>
+
+                {/* Posts Grid */}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+                    {posts.map((post, index) => (
+                        <PostCard key={post.slug} post={post} index={index} />
+                    ))}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                    {posts.length > 0 ? (
-                        posts.map((post: any) => (
-                            <BlogCard key={post._id} post={post} />
-                        ))
-                    ) : (
-                        <p className="text-secondary col-span-full py-12 text-center bg-gray-50 rounded-lg">
-                            No posts found.
-                        </p>
-                    )}
-                </div>
+                {/* View More Button */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                    className="text-center"
+                >
+                    <Link href="/activities">
+                        <motion.span
+                            className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-border text-foreground font-medium hover:bg-muted transition-colors duration-300"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            모든 활동 보기
+                            <ArrowRight className="w-4 h-4" />
+                        </motion.span>
+                    </Link>
+                </motion.div>
             </div>
-        </main>
+        </section>
     );
 }
 </file>
 
-<file path="web/src/app/insights/page.tsx">
-import { client } from "@/sanity/lib/client";
-import { LINKS_QUERY } from "@/sanity/lib/queries";
-import { LinkCard } from "@/components/features/LinkCard";
+<file path="src/components/features/cta-section.tsx">
+"use client";
 
-export const revalidate = 60;
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import Link from "next/link";
+import { ArrowRight, Heart, Users, Sparkles } from "lucide-react";
+import { fadeInUp, staggerContainer } from "@/lib/animations";
 
-export default async function InsightsPage() {
-    const links = await client.fetch(LINKS_QUERY);
+export function CTASection() {
+    const sectionRef = useRef(null);
+    const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
     return (
-        <main className="py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto w-full">
-            <div className="flex flex-col gap-12">
-                <div className="flex flex-col gap-4 border-b border-gray-100 pb-8">
-                    <h1 className="text-4xl font-bold tracking-tight text-primary">Insights</h1>
-                    <p className="text-lg text-secondary max-w-2xl">
-                        A curated collection of articles, news, and resources that inspire.
-                    </p>
-                </div>
+        <section
+            ref={sectionRef}
+            className="relative py-32 overflow-hidden"
+        >
+            {/* Background */}
+            <div className="absolute inset-0 -z-10">
+                {/* Gradient background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-violet-950 to-slate-950" />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {links.length > 0 ? (
-                        links.map((link: any) => (
-                            <LinkCard key={link._id} link={link} />
-                        ))
-                    ) : (
-                        <p className="text-secondary col-span-full py-12 text-center bg-gray-50 rounded-lg">
-                            No curated links yet.
-                        </p>
-                    )}
-                </div>
+                {/* Animated gradient orbs */}
+                <motion.div
+                    className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/20 blur-[100px]"
+                    animate={{
+                        x: [0, 30, 0],
+                        y: [0, -30, 0],
+                    }}
+                    transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                    }}
+                />
+                <motion.div
+                    className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-violet-500/20 blur-[100px]"
+                    animate={{
+                        x: [0, -20, 0],
+                        y: [0, 20, 0],
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                    }}
+                />
+
+                {/* Pattern overlay */}
+                <div
+                    className="absolute inset-0 opacity-[0.02]"
+                    style={{
+                        backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+                        backgroundSize: '50px 50px',
+                    }}
+                />
             </div>
-        </main>
+
+            <div className="container mx-auto px-4 max-w-5xl relative">
+                <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate={isInView ? "visible" : "hidden"}
+                    className="text-center"
+                >
+                    {/* Icons */}
+                    <motion.div
+                        variants={fadeInUp}
+                        className="flex justify-center gap-4 mb-8"
+                    >
+                        {[Heart, Users, Sparkles].map((Icon, index) => (
+                            <motion.div
+                                key={index}
+                                className="p-3 rounded-full bg-white/5 border border-white/10"
+                                animate={{
+                                    y: [0, -5, 0],
+                                }}
+                                transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    delay: index * 0.2,
+                                }}
+                            >
+                                <Icon className="w-6 h-6 text-blue-400" />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    {/* Main Headline */}
+                    <motion.h2
+                        variants={fadeInUp}
+                        className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+                    >
+                        청년의 목소리로
+                        <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-violet-400 to-purple-400">
+                            대한민국을 바꿉니다
+                        </span>
+                    </motion.h2>
+
+                    {/* Subtitle */}
+                    <motion.p
+                        variants={fadeInUp}
+                        className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed"
+                    >
+                        청년 정치에 조금이라도 관심이 있다면 누구나 가능합니다.
+                        <br className="hidden sm:block" />
+                        지금 바로 한국청년유권자연맹과 함께하세요.
+                    </motion.p>
+
+                    {/* CTA Button */}
+                    <motion.div variants={fadeInUp}>
+                        <Link href="/join">
+                            <motion.button
+                                className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 text-white font-semibold text-lg overflow-hidden"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                {/* Glow effect */}
+                                <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-violet-400 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+
+                                {/* Shimmer effect */}
+                                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                                <span className="relative z-10">함께하기</span>
+                                <motion.span
+                                    className="relative z-10"
+                                    animate={{ x: [0, 5, 0] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                >
+                                    <ArrowRight className="w-5 h-5" />
+                                </motion.span>
+                            </motion.button>
+                        </Link>
+                    </motion.div>
+
+                    {/* Trust indicators */}
+                    <motion.div
+                        variants={fadeInUp}
+                        className="mt-12 flex flex-wrap justify-center gap-8 text-slate-400 text-sm"
+                    >
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-green-400" />
+                            <span>2010년 설립</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-blue-400" />
+                            <span>비영리 사단법인</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-violet-400" />
+                            <span>정치적 중립</span>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            </div>
+        </section>
     );
 }
 </file>
 
-<file path="web/src/app/layout.tsx">
+<file path="src/components/features/impact-section.tsx">
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { staggerContainer, fadeInUp } from "@/lib/animations";
+
+interface ImpactStat {
+    value: number;
+    suffix: string;
+    label: string;
+    description: string;
+}
+
+const impactStats: ImpactStat[] = [
+    {
+        value: 2500,
+        suffix: "+",
+        label: "청년 참여",
+        description: "다양한 프로그램에 참여한 청년",
+    },
+    {
+        value: 15,
+        suffix: "년",
+        label: "활동 역사",
+        description: "2010년부터 이어온 활동",
+    },
+    {
+        value: 50,
+        suffix: "+",
+        label: "파트너 기관",
+        description: "함께하는 협력 기관",
+    },
+    {
+        value: 100,
+        suffix: "+",
+        label: "프로그램",
+        description: "진행된 리더십 프로그램",
+    },
+];
+
+function CountUpNumber({ value, suffix, isInView }: { value: number; suffix: string; isInView: boolean }) {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        if (!isInView) return;
+
+        const duration = 2000;
+        const steps = 60;
+        const stepValue = value / steps;
+        const stepDuration = duration / steps;
+        let currentStep = 0;
+
+        const timer = setInterval(() => {
+            currentStep++;
+            if (currentStep >= steps) {
+                setCount(value);
+                clearInterval(timer);
+            } else {
+                setCount(Math.floor(stepValue * currentStep));
+            }
+        }, stepDuration);
+
+        return () => clearInterval(timer);
+    }, [isInView, value]);
+
+    return (
+        <span className="tabular-nums">
+            {count.toLocaleString()}{suffix}
+        </span>
+    );
+}
+
+export function ImpactSection() {
+    const sectionRef = useRef(null);
+    const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+    return (
+        <section
+            ref={sectionRef}
+            className="relative py-24 overflow-hidden"
+        >
+            {/* Background */}
+            <div className="absolute inset-0 -z-10">
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950" />
+                {/* Subtle grid pattern */}
+                <div
+                    className="absolute inset-0 opacity-[0.02]"
+                    style={{
+                        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)`,
+                        backgroundSize: '40px 40px',
+                    }}
+                />
+            </div>
+
+            <div className="container mx-auto px-4 max-w-6xl">
+                {/* Section Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.6 }}
+                    className="text-center mb-16"
+                >
+                    <span className="text-blue-400 font-medium text-sm tracking-wider uppercase mb-4 block">
+                        Our Impact
+                    </span>
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                        청년들과 함께한 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">성과</span>
+                    </h2>
+                    <p className="text-slate-400 max-w-2xl mx-auto">
+                        한국청년유권자연맹은 대한민국 청년들의 정치 참여와 리더십 성장을 위해 끊임없이 노력해왔습니다.
+                    </p>
+                </motion.div>
+
+                {/* Stats Grid */}
+                <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate={isInView ? "visible" : "hidden"}
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+                >
+                    {impactStats.map((stat, index) => (
+                        <motion.div
+                            key={stat.label}
+                            variants={fadeInUp}
+                            className="group relative"
+                        >
+                            {/* Glassmorphism Card */}
+                            <div className="relative p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+                                {/* Glow effect on hover */}
+                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl -z-10" />
+
+                                {/* Number */}
+                                <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                                    <CountUpNumber
+                                        value={stat.value}
+                                        suffix={stat.suffix}
+                                        isInView={isInView}
+                                    />
+                                </div>
+
+                                {/* Label */}
+                                <div className="text-lg font-semibold text-white/90 mb-1">
+                                    {stat.label}
+                                </div>
+
+                                {/* Description */}
+                                <div className="text-sm text-slate-400">
+                                    {stat.description}
+                                </div>
+
+                                {/* Decorative corner */}
+                                <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-blue-500/30 rounded-tr-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            </div>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
+        </section>
+    );
+}
+</file>
+
+<file path="src/components/features/news-section.tsx">
+"use client";
+
+import { useRef } from "react";
+import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { PostCard } from "./post-card";
+import { fadeInUp, staggerContainer } from "@/lib/animations";
+import type { Post } from "@/types/post";
+
+interface NewsSectionProps {
+    posts: Post[];
+}
+
+export function NewsSection({ posts }: NewsSectionProps) {
+    const sectionRef = useRef(null);
+    const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+    return (
+        <section
+            ref={sectionRef}
+            className="relative py-24 bg-muted/30"
+        >
+            <div className="container mx-auto px-4 max-w-6xl">
+                {/* Section Header */}
+                <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate={isInView ? "visible" : "hidden"}
+                    className="text-center mb-16"
+                >
+                    <motion.span
+                        variants={fadeInUp}
+                        className="inline-block text-primary font-medium text-sm tracking-wider uppercase mb-4"
+                    >
+                        News
+                    </motion.span>
+                    <motion.h2
+                        variants={fadeInUp}
+                        className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                    >
+                        청연
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">
+                            {" "}뉴스
+                        </span>
+                    </motion.h2>
+                    <motion.p
+                        variants={fadeInUp}
+                        className="text-muted-foreground text-lg max-w-2xl mx-auto"
+                    >
+                        뉴스에 등장한 청연 소식을 확인해보세요.
+                    </motion.p>
+                </motion.div>
+
+                {/* Posts Grid */}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+                    {posts.map((post, index) => (
+                        <PostCard key={post.slug} post={post} index={index} />
+                    ))}
+                </div>
+
+                {/* View More Button */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                    className="text-center"
+                >
+                    <Link href="/news">
+                        <motion.span
+                            className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-border text-foreground font-medium hover:bg-muted transition-colors duration-300"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            모든 뉴스 보기
+                            <ArrowRight className="w-4 h-4" />
+                        </motion.span>
+                    </Link>
+                </motion.div>
+            </div>
+        </section>
+    );
+}
+</file>
+
+<file path="src/components/features/section-wrapper.tsx">
+"use client";
+
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { fadeInUp, staggerContainer } from "@/lib/animations";
+import { cn } from "@/lib/utils";
+
+interface SectionHeaderProps {
+    badge?: string;
+    title: string;
+    highlight?: string;
+    description?: string;
+    className?: string;
+}
+
+export function SectionHeader({ badge, title, highlight, description, className }: SectionHeaderProps) {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+    return (
+        <motion.div
+            ref={ref}
+            variants={staggerContainer}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            className={cn("text-center mb-16", className)}
+        >
+            {badge && (
+                <motion.span
+                    variants={fadeInUp}
+                    className="inline-block text-primary font-medium text-sm tracking-wider uppercase mb-4"
+                >
+                    {badge}
+                </motion.span>
+            )}
+            <motion.h2
+                variants={fadeInUp}
+                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+            >
+                {title}
+                {highlight && (
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">
+                        {" "}{highlight}
+                    </span>
+                )}
+            </motion.h2>
+            {description && (
+                <motion.p
+                    variants={fadeInUp}
+                    className="text-muted-foreground text-lg max-w-2xl mx-auto"
+                >
+                    {description}
+                </motion.p>
+            )}
+        </motion.div>
+    );
+}
+
+interface SectionWrapperProps {
+    children: React.ReactNode;
+    className?: string;
+    dark?: boolean;
+}
+
+export function SectionWrapper({ children, className, dark }: SectionWrapperProps) {
+    return (
+        <section
+            className={cn(
+                "relative py-24 overflow-hidden",
+                dark && "bg-slate-950",
+                className
+            )}
+        >
+            {children}
+        </section>
+    );
+}
+</file>
+
+<file path="src/components/layout/footer.tsx">
+export function Footer() {
+    return (
+        <footer className="border-t bg-muted/40">
+            <div className="container mx-auto py-8 px-4 text-center text-sm text-muted-foreground">
+                <p>&copy; {new Date().getFullYear()} Powerhouse Korea. All rights reserved.</p>
+            </div>
+        </footer>
+    );
+}
+</file>
+
+<file path="src/components/ui/button.tsx">
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+        "icon-sm": "size-8",
+        "icon-lg": "size-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot : "button"
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
+
+export { Button, buttonVariants }
+</file>
+
+<file path="src/components/ui/card.tsx">
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+function Card({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card"
+      className={cn(
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-header"
+      className={cn(
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-title"
+      className={cn("leading-none font-semibold", className)}
+      {...props}
+    />
+  )
+}
+
+function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  )
+}
+
+function CardAction({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-action"
+      className={cn(
+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-content"
+      className={cn("px-6", className)}
+      {...props}
+    />
+  )
+}
+
+function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-footer"
+      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+      {...props}
+    />
+  )
+}
+
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+}
+</file>
+
+<file path="src/lib/animations.ts">
+import { Variants } from 'framer-motion'
+
+// Custom easing
+export const customEase = [0.25, 0.1, 0.25, 1] as const
+
+// Fade in from bottom
+export const fadeInUp: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 30,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: customEase,
+    },
+  },
+}
+
+// Fade in from left
+export const fadeInLeft: Variants = {
+  hidden: {
+    opacity: 0,
+    x: -30,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.6,
+      ease: customEase,
+    },
+  },
+}
+
+// Fade in from right
+export const fadeInRight: Variants = {
+  hidden: {
+    opacity: 0,
+    x: 30,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.6,
+      ease: customEase,
+    },
+  },
+}
+
+// Simple fade
+export const fadeIn: Variants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+      ease: customEase,
+    },
+  },
+}
+
+// Scale fade
+export const scaleFadeIn: Variants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.95,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: customEase,
+    },
+  },
+}
+
+// Scale in (alias for scaleFadeIn)
+export const scaleIn: Variants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.9,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: customEase,
+    },
+  },
+}
+
+// Stagger container
+export const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+// Stagger container - slower
+export const staggerContainerSlow: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+}
+
+// Hero text animation
+export const heroTextVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 40,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: customEase,
+    },
+  },
+}
+
+// Card hover animation
+export const cardHover = {
+  rest: {
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+      ease: customEase,
+    },
+  },
+  hover: {
+    scale: 1.02,
+    y: -5,
+    transition: {
+      duration: 0.3,
+      ease: customEase,
+    },
+  },
+}
+
+// Button glow animation
+export const buttonGlow: Variants = {
+  rest: {
+    boxShadow: '0 0 0 rgba(59, 130, 246, 0)',
+  },
+  hover: {
+    boxShadow: '0 0 30px rgba(59, 130, 246, 0.5)',
+    transition: {
+      duration: 0.3,
+    },
+  },
+}
+
+// Float animation for decorative elements
+export const floatAnimation: Variants = {
+  initial: {
+    y: 0,
+  },
+  animate: {
+    y: [-10, 10, -10],
+    transition: {
+      duration: 6,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    },
+  },
+}
+
+// Pulse animation
+export const pulseAnimation: Variants = {
+  initial: {
+    scale: 1,
+    opacity: 0.5,
+  },
+  animate: {
+    scale: [1, 1.1, 1],
+    opacity: [0.5, 0.8, 0.5],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    },
+  },
+}
+
+// Viewport settings for whileInView
+export const viewportSettings = {
+  once: true,
+  margin: '-100px',
+}
+
+export const viewportSettingsEager = {
+  once: true,
+  margin: '-50px',
+}
+</file>
+
+<file path="src/lib/keystatic.ts">
+import { createReader } from '@keystatic/core/reader'
+import keystaticConfig from '../../keystatic.config'
+import type { Post, Person, LinkCard } from '@/types/post'
+
+export const reader = createReader(process.cwd(), keystaticConfig)
+
+// Re-export types for convenience
+export type { Post, Person, LinkCard }
+
+// Posts 관련 함수들
+export async function getAllPosts(): Promise<Post[]> {
+  const posts = await reader.collections.posts.all()
+  return posts
+    .map((post) => ({
+      slug: post.slug,
+      title: post.entry.title,
+      mainImage: post.entry.mainImage,
+      categories: post.entry.categories,
+      publishedAt: post.entry.publishedAt,
+      summary: post.entry.summary,
+      body: '', // MDX는 별도로 처리
+    }))
+    .sort((a, b) => {
+      if (!a.publishedAt || !b.publishedAt) return 0
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    })
+}
+
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  const post = await reader.collections.posts.read(slug)
+  if (!post) return null
+
+  return {
+    slug,
+    title: post.title,
+    mainImage: post.mainImage,
+    categories: post.categories,
+    publishedAt: post.publishedAt,
+    summary: post.summary,
+    body: '', // MDX 콘텐츠는 페이지에서 직접 import하여 처리
+  }
+}
+
+export async function getNewsPosts(): Promise<Post[]> {
+  const posts = await getAllPosts()
+  return posts.filter((post) => post.categories.includes('news'))
+}
+
+export async function getActivityPosts(): Promise<Post[]> {
+  const posts = await getAllPosts()
+  return posts.filter((post) => post.categories.includes('activity'))
+}
+
+export async function getLatestNews(limit: number = 3): Promise<Post[]> {
+  const news = await getNewsPosts()
+  return news.slice(0, limit)
+}
+
+// People 관련 함수들
+export async function getAllPeople(): Promise<Person[]> {
+  const people = await reader.collections.people.all()
+  return people
+    .map((person) => ({
+      slug: person.slug,
+      name: person.entry.name,
+      role: person.entry.role,
+      image: person.entry.image,
+      bio: person.entry.bio,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+}
+
+// LinkCards 관련 함수들
+export async function getAllLinkCards(): Promise<LinkCard[]> {
+  const cards = await reader.collections.linkCards.all()
+  return cards
+    .map((card) => ({
+      slug: card.slug,
+      title: card.entry.title,
+      url: card.entry.url,
+      description: card.entry.description,
+      thumbnail: card.entry.thumbnail,
+      publishedAt: card.entry.publishedAt,
+    }))
+    .sort((a, b) => {
+      if (!a.publishedAt || !b.publishedAt) return 0
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    })
+}
+</file>
+
+<file path="src/lib/utils.ts">
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+</file>
+
+<file path="src/app/layout.tsx">
 import type { Metadata } from "next";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+
+const notoSansKR = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-noto-sans-kr",
+});
 
 export const metadata: Metadata = {
-  title: "Impact Founder",
-  description: "Personal branding website and blog.",
+  title: {
+    default: "한국청년유권자연맹",
+    template: "%s | 한국청년유권자연맹",
+  },
+  description: "청년의 정치 참여와 민주시민 교육을 위한 한국청년유권자연맹입니다.",
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    siteName: "한국청년유권자연맹",
+  },
 };
 
 export default function RootLayout({
@@ -497,18 +1834,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
-      <head>
-        <link
-          rel="stylesheet"
-          as="style"
-          crossOrigin="anonymous"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
-        />
-      </head>
-      <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
+    <html lang="ko" className={notoSansKR.variable}>
+      <body className="antialiased font-sans flex min-h-screen flex-col">
         <Header />
-        {children}
+        <main className="flex-1">{children}</main>
         <Footer />
       </body>
     </html>
@@ -516,572 +1845,618 @@ export default function RootLayout({
 }
 </file>
 
-<file path="web/src/components/features/BlogCard.tsx">
-import Link from 'next/link'
-import Image from 'next/image'
-import { urlFor } from '@/sanity/lib/image'
+<file path="src/components/features/post-detail.tsx">
+import Image from "next/image";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import type { Post } from "@/types/post";
 
-interface BlogCardProps {
-    post: {
-        title: string
-        slug: { current: string }
-        mainImage?: any
-        publishedAt: string
-        categories?: { title: string }[]
-    }
+type PostType = "activity" | "news";
+
+interface PostDetailProps {
+  post: Post;
+  type: PostType;
+  content?: React.ReactNode; // MDX 렌더링된 콘텐츠
 }
 
-export function BlogCard({ post }: BlogCardProps) {
-    return (
-        <Link href={`/blog/${post.slug.current}`} className="group flex flex-col gap-4 p-4 rounded-lg border border-border bg-white hover:shadow-lg transition-all duration-300">
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-muted">
-                {post.mainImage ? (
-                    <Image
-                        src={urlFor(post.mainImage).width(800).height(450).url()}
-                        alt={post.mainImage.alt || post.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                ) : (
-                    <div className="flex h-full items-center justify-center text-secondary">
-                        No Image
-                    </div>
-                )}
-            </div>
-            <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-xs font-medium text-secondary uppercase tracking-wider">
-                    {post.categories?.[0]?.title || 'Blog'} • {new Date(post.publishedAt).toLocaleDateString()}
-                </div>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                    {post.title}
-                </h3>
-            </div>
-        </Link>
-    )
-}
-</file>
+export function PostDetail({ post, type, content }: PostDetailProps) {
+  const hasValidDate =
+    post.publishedAt &&
+    typeof post.publishedAt === "string" &&
+    !isNaN(new Date(post.publishedAt).getTime());
 
-<file path="web/src/components/features/LinkCard.tsx">
-import Image from 'next/image'
-import { urlFor } from '@/sanity/lib/image'
-
-interface LinkCardProps {
-    link: {
-        url: string
-        title: string
-        description?: string
-        image?: any
-        publishedAt: string
-    }
-}
-
-export function LinkCard({ link }: LinkCardProps) {
-    return (
-        <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex flex-col gap-4 p-4 rounded-lg border border-border bg-white hover:shadow-lg transition-all duration-300"
-        >
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-muted">
-                {link.image ? (
-                    <Image
-                        src={urlFor(link.image).width(800).height(450).url()}
-                        alt={link.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                ) : (
-                    <div className="flex h-full items-center justify-center text-secondary">
-                        No Image
-                    </div>
-                )}
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs font-medium text-secondary uppercase tracking-wider">
-                    {new Date(link.publishedAt).toLocaleDateString()}
-                </span>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-accent transition-colors line-clamp-2">
-                    {link.title}
-                </h3>
-                {link.description && (
-                    <p className="text-sm text-secondary line-clamp-2">
-                        {link.description}
-                    </p>
-                )}
-            </div>
-        </a>
-    )
-}
-</file>
-
-<file path="web/src/components/features/PostList.tsx">
-"use client"
-
-import { useState } from "react"
-import { BlogCard } from "./BlogCard"
-
-interface Category {
-    _id: string
-    title: string
-    slug: {
-        current: string
-    }
-}
-
-interface Post {
-    _id: string
-    title: string
-    slug: {
-        current: string
-    }
-    publishedAt: string
-    mainImage: any
-    categories: {
-        title: string
-    }[]
-}
-
-interface PostListProps {
-    posts: Post[]
-    categories: Category[]
-}
-
-export function PostList({ posts, categories }: PostListProps) {
-    const [selectedCategory, setSelectedCategory] = useState<string>("all")
-
-    const filteredPosts = selectedCategory === "all"
-        ? posts
-        : posts.filter(post =>
-            post.categories?.some(cat => cat.title === selectedCategory)
-        )
-
-    {/* Post Grid */ }
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px]">
-        {filteredPosts.length > 0 ? (
-            filteredPosts.map((post) => (
-                <BlogCard key={post._id} post={post} />
+  return (
+    <article className="container mx-auto px-4 py-12 max-w-4xl">
+      {/* Header */}
+      <div className="mb-8 text-center">
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
+          {type === "activity" ? (
+            <span className="uppercase tracking-wider font-medium text-primary">
+              Activity
+            </span>
+          ) : (
+            post.categories?.map((cat: string) => (
+              <span
+                key={cat}
+                className="uppercase tracking-wider font-medium text-primary"
+              >
+                {cat}
+              </span>
             ))
-        ) : (
-            <div className="col-span-full flex items-center justify-center text-secondary">
-                해당 카테고리에 글이 없습니다.
-            </div>
+          )}
+          <span>•</span>
+          {hasValidDate && (
+            <time dateTime={post.publishedAt!}>
+              {format(new Date(post.publishedAt as string), "PPP", {
+                locale: ko,
+              })}
+            </time>
+          )}
+        </div>
+
+        <h1 className="text-3xl font-bold tracking-tight sm:text-5xl mb-6 leading-tight">
+          {post.title}
+        </h1>
+
+        {post.summary && (
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            {post.summary}
+          </p>
         )}
-    </div>
-        </div >
-    )
+      </div>
+
+      {/* Main image */}
+      {post.mainImage && (
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl mb-12 bg-muted">
+          <Image
+            src={post.mainImage}
+            alt={post.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
+
+      {/* Body - MDX Content */}
+      <div className="prose prose-lg dark:prose-invert mx-auto">
+        {content}
+      </div>
+    </article>
+  );
 }
 </file>
 
-<file path="web/src/components/layout/Footer.tsx">
-export function Footer() {
+<file path="src/types/post.ts">
+// Keystatic용 Post 타입 정의
+export interface Post {
+  slug: string
+  title: string
+  mainImage: string | null
+  categories: readonly ('news' | 'activity')[]
+  publishedAt: string | null
+  summary: string | null
+  body?: string // MDX content
+}
+
+export interface Person {
+  slug: string
+  name: string
+  role: string | null
+  image: string | null
+  bio: string | null
+}
+
+export interface LinkCard {
+  slug: string
+  title: string
+  url: string
+  description: string | null
+  thumbnail: string | null
+  publishedAt: string | null
+}
+</file>
+
+<file path="src/app/activities/[slug]/page.tsx">
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { PostDetail } from "@/components/features/post-detail";
+import { getPostDetail, generatePostStaticParams, generatePostMetadata } from "@/lib/post-utils";
+
+export const revalidate = 60;
+
+interface PageProps {
+    params: Promise<{ slug: string }>;
+}
+
+export async function generateStaticParams() {
+    return generatePostStaticParams("activity");
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    return generatePostMetadata(slug, "activity");
+}
+
+export default async function ActivityPage({ params }: PageProps) {
+    const { slug } = await params;
+    const result = await getPostDetail(slug);
+
+    if (!result) {
+        notFound();
+    }
+
+    const { post, Content } = result;
+    return <PostDetail post={post} type="activity" content={<Content />} />;
+}
+</file>
+
+<file path="src/app/globals.css">
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-noto-sans-kr), -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-serif: var(--font-noto-sans-kr), -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0 0); /* Slightly darker for better readability */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.55 0.18 250); /* 파란색 계열 - 로고 컬러 참고 */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.45 0 0); /* Darker muted text for better contrast */
+  --accent: oklch(0.95 0.02 250); /* 연한 파란색 계열 */
+  --accent-foreground: oklch(0.55 0.18 250);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.55 0.18 250); /* 포커스 링도 파란색 계열 */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.65 0.18 250); /* 다크 모드에서도 파란색 계열 유지 */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.75 0 0); /* Lighter muted text in dark mode */
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    overflow-y: scroll;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+</file>
+
+<file path="src/app/people/page.tsx">
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+export const revalidate = 60;
+
+const leadership = [
+    {
+        name: "정재욱",
+        role: "상임대표",
+        bio: [
+            "서강대학교, 경희대학교 겸임교수",
+            "강남구 청년정책위원회 공동위원장",
+            "전 서울시 청년자치정부 추진위원회 공동추진위원장",
+            "전 LH청년위원회 위원장"
+        ]
+    }
+];
+
+const advisors = [
+    {
+        name: "이부형",
+        role: "고문",
+        bio: [
+            "국민의힘 중앙위원회 부위원장",
+            "전 대통령 비서실 행정관",
+            "전 경상북도 경제특별보좌관",
+            "전 새누리당 중앙청년위원장",
+            "전 위덕대학교 산학부총장",
+            "전 동국대학교 인재교육원 원장, 산학협력 초빙교수"
+        ]
+    },
+    {
+        name: "장경태",
+        role: "고문",
+        bio: [
+            "제21대, 제22대 국회의원(서울 동대문구을)",
+            "더불어민주당 서울특별시당 위원장",
+            "전 더불어민주당 최고위원",
+            "전 더불어민주당 전국청년위원장",
+            "전 더불어민주당 정치혁신위원장"
+        ]
+    }
+];
+
+const steeringCommittee = [
+    {
+        name: "박용범",
+        role: "중앙 운영위원장",
+        bio: [
+            "한국청년유권자연맹 부설 ‘청년일자리정책연구소 소장’",
+            "전 대통령직속일자리위원회 청년TF위원",
+            "전 고용고용부 청년TF위원",
+            "전 청주시 청년정책위원회 위원장",
+            "전 한국청년유권자연맹 사무총장, 충북지부위원장"
+        ]
+    },
+    {
+        name: "이승환",
+        role: "운영위원",
+        bio: ["이슈 큐레이팅 매거진 'ㅍㅍㅅㅅ' 대표"]
+    },
+    {
+        name: "이예송",
+        role: "운영위원",
+        bio: ["전 서울시 미래청년기획단 주무관"]
+    },
+    {
+        name: "심성훈",
+        role: "운영위원",
+        bio: ["국민의힘 제22대 총선 영입인재, 국민의힘 공약개발본부 중앙공약개발단 자문위원"]
+    },
+    {
+        name: "정주현",
+        role: "운영위원",
+        bio: ["윈지코리아컨설팅 부대표"]
+    },
+    {
+        name: "최영은",
+        role: "운영위원",
+        bio: ["KTV 기자"]
+    }
+];
+
+function PersonCard({ person }: { person: { name: string, role: string, bio: string[] } }) {
     return (
-        <footer className="w-full py-12 px-6 md:px-12 lg:px-24 border-t border-gray-100 mt-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="text-sm text-secondary">
-                    © {new Date().getFullYear()} Impact Founder. All rights reserved.
+        <Card className="h-full border-none shadow-none bg-transparent">
+            <CardHeader className="p-0 mb-4">
+                <div className="flex items-baseline gap-2 mb-1">
+                    <CardTitle className="text-xl font-bold">{person.name}</CardTitle>
+                    <CardDescription className="text-primary font-medium text-base">{person.role}</CardDescription>
                 </div>
-                <div className="flex gap-6 text-sm text-secondary">
-                    <a href="#" className="hover:text-primary transition-colors">Twitter</a>
-                    <a href="#" className="hover:text-primary transition-colors">LinkedIn</a>
-                    <a href="#" className="hover:text-primary transition-colors">Email</a>
+                <div className="w-10 h-1 bg-primary/20 rounded-full" />
+            </CardHeader>
+            <CardContent className="p-0">
+                <ul className="space-y-1">
+                    {person.bio.map((line, i) => (
+                        <li key={i} className="text-muted-foreground text-sm leading-relaxed">
+                            {line}
+                        </li>
+                    ))}
+                </ul>
+            </CardContent>
+        </Card>
+    );
+}
+
+export default function PeoplePage() {
+    return (
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
+            <div className="mb-20 text-center space-y-6">
+                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+                    청연과 함께하는 사람들
+                </h1>
+                <div className="space-y-2 text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+                    <p>한국청년유권자연맹은 어떤 사람들과 함께하고 있을까요?</p>
+                    <p>대한민국에 청년의 목소리를 담기 위해 활동하는 사람들을 소개합니다!</p>
                 </div>
             </div>
-        </footer>
-    )
+
+            <div className="space-y-20">
+                {/* Leadership Section */}
+                <section>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 justify-center">
+                        {leadership.map((person) => (
+                            <PersonCard key={person.name} person={person} />
+                        ))}
+                    </div>
+                </section>
+
+                {/* Advisors Section */}
+                <section>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                        {advisors.map((person) => (
+                            <PersonCard key={person.name} person={person} />
+                        ))}
+                    </div>
+                </section>
+
+                {/* Steering Committee Section */}
+                <section>
+                    <h2 className="text-2xl font-bold mb-10 pb-4 border-b">중앙 운영위원</h2>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                        {steeringCommittee.map((person) => (
+                            <PersonCard key={person.name} person={person} />
+                        ))}
+                    </div>
+                </section>
+            </div>
+        </div>
+    );
 }
 </file>
 
-<file path="web/src/components/layout/Header.tsx">
-import Link from 'next/link'
+<file path="src/components/layout/header.tsx">
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { MobileMenu } from "./mobile-menu";
+
+const LOGO_PATH = "/logo.png";
+
+const navItems = [
+    { href: "/about", label: "소개" },
+    { href: "/people", label: "사람들" },
+    { href: "/activities", label: "활동" },
+    { href: "/news", label: "뉴스" },
+];
 
 export function Header() {
-    return (
-        <header className="w-full py-4 px-6 md:px-12 lg:px-24 flex justify-between items-center bg-white border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-white/95">
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
 
-            {/* 로고 */}
-            <Link href="/" className="text-xl font-bold tracking-tight text-foreground hover:text-primary transition-colors">
-                IMPACT FOUNDER
-            </Link>
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
 
-            {/* PC 메뉴: About을 가장 위로 올렸습니다 */}
-            <nav className="hidden md:flex gap-8">
-                {/* 1. About (가장 왼쪽) */}
-                <Link href="/about" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
-                    About
-                </Link>
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
-                {/* 2. Blog */}
-                <Link href="/blog" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
-                    Blog
-                </Link>
+    // Close mobile menu on route change
+    useEffect(() => {
+        setIsMobileMenuOpen(false);
+    }, [pathname]);
 
-                {/* 3. Media */}
-                <Link href="/media" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
-                    Media
-                </Link>
-            </nav>
-
-            {/* 모바일 메뉴 버튼 */}
-            <button className="md:hidden p-2 text-secondary hover:bg-muted rounded transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-            </button>
-
-        </header>
-    )
-}
-</file>
-
-<file path="web/src/sanity/components/UrlInput.tsx">
-import { Button, Stack, useToast, Box } from '@sanity/ui'
-import { useCallback, useState } from 'react'
-import { set, type ObjectInputProps } from 'sanity'
-
-export function LinkMetadataInput(props: ObjectInputProps) {
-    const { onChange, members, renderDefault } = props
-    const [isLoading, setIsLoading] = useState(false)
-    const toast = useToast()
-
-    // Find the URL member to get its value
-    const urlMember = members.find((member) => member.kind === 'field' && member.name === 'url')
-
-    // Safe access to value
-    // @ts-ignore
-    const urlValue = urlMember?.field?.value
-
-    const handleFetch = useCallback(async () => {
-        if (!urlValue) {
-            toast.push({ status: 'error', title: 'URL is missing' })
-            return
+    // Prevent body scroll when mobile menu is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
         }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [isMobileMenuOpen]);
 
-        setIsLoading(true)
-        try {
-            const response = await fetch(`/api/og?url=${encodeURIComponent(urlValue)}`)
-            const data = await response.json()
-
-            if (data.error) throw new Error(data.error)
-
-            const patches = [
-                set(data.title, ['title']),
-                set(data.description, ['description']),
-            ]
-
-            onChange(patches)
-
-            toast.push({
-                status: 'success',
-                title: 'Metadata Fetched',
-                description: 'Title and Description updated.',
-            })
-        } catch (err) {
-            console.error(err)
-            toast.push({
-                status: 'error',
-                title: 'Fetch Failed',
-                description: 'Could not fetch metadata.',
-            })
-        } finally {
-            setIsLoading(false)
-        }
-    }, [urlValue, onChange, toast])
+    const isHomePage = pathname === "/";
 
     return (
-        <Stack space={3}>
-            {renderDefault({
-                ...props,
-                renderDefault: undefined
-            })}
-            <Box padding={2}>
-                <Button
-                    mode="ghost"
-                    tone="primary"
-                    onClick={handleFetch}
-                    text={isLoading ? 'Fetching Metadata...' : '✨ Auto-Fill Metadata'}
-                    disabled={isLoading || !urlValue}
-                />
-            </Box>
-        </Stack>
-    )
+        <>
+            <motion.header
+                className={cn(
+                    "fixed top-0 z-50 w-full transition-all duration-300",
+                    isScrolled
+                        ? "bg-background/80 backdrop-blur-lg border-b border-border/50 shadow-sm"
+                        : "bg-transparent"
+                )}
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+                <div className="container mx-auto flex h-16 md:h-20 items-center justify-between px-4">
+                    {/* Logo */}
+                    <Link href="/" className="relative z-10 flex items-center group">
+                        <motion.div
+                            className="relative h-10 w-auto flex items-center"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <Image
+                                src={LOGO_PATH}
+                                alt="Powerhouse Korea"
+                                width={150}
+                                height={50}
+                                className={cn(
+                                    "h-10 w-auto object-contain transition-all duration-300",
+                                    !isScrolled && isHomePage && "brightness-0 invert"
+                                )}
+                                priority
+                            />
+                        </motion.div>
+                    </Link>
+
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex items-center gap-1">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
+                                        isActive
+                                            ? "text-primary"
+                                            : isScrolled || !isHomePage
+                                                ? "text-foreground/70 hover:text-foreground hover:bg-muted"
+                                                : "text-white/80 hover:text-white hover:bg-white/10"
+                                    )}
+                                >
+                                    {item.label}
+                                    {isActive && (
+                                        <motion.div
+                                            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"
+                                            layoutId="activeNav"
+                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                        />
+                                    )}
+                                </Link>
+                            );
+                        })}
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                            <Link
+                                href="/join"
+                                className={cn(
+                                    "ml-4 px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300",
+                                    isScrolled || !isHomePage
+                                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
+                                        : "bg-white text-slate-900 hover:bg-white/90"
+                                )}
+                            >
+                                함께하기
+                            </Link>
+                        </motion.div>
+                    </nav>
+
+                    {/* Mobile Menu Button */}
+                    <motion.button
+                        className={cn(
+                            "md:hidden relative z-10 p-2 rounded-full transition-colors",
+                            isMobileMenuOpen
+                                ? "text-foreground"
+                                : isScrolled || !isHomePage
+                                    ? "text-foreground hover:bg-muted"
+                                    : "text-white hover:bg-white/10"
+                        )}
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <AnimatePresence mode="wait">
+                            {isMobileMenuOpen ? (
+                                <motion.div
+                                    key="close"
+                                    initial={{ opacity: 0, rotate: -90 }}
+                                    animate={{ opacity: 1, rotate: 0 }}
+                                    exit={{ opacity: 0, rotate: 90 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <X className="h-6 w-6" />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="menu"
+                                    initial={{ opacity: 0, rotate: 90 }}
+                                    animate={{ opacity: 1, rotate: 0 }}
+                                    exit={{ opacity: 0, rotate: -90 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Menu className="h-6 w-6" />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                        <span className="sr-only">Toggle menu</span>
+                    </motion.button>
+                </div>
+            </motion.header>
+
+            {/* Mobile Menu */}
+            <MobileMenu
+                isOpen={isMobileMenuOpen}
+                navItems={navItems}
+                pathname={pathname}
+            />
+        </>
+    );
 }
 </file>
 
-<file path="web/src/sanity/env.ts">
-export const apiVersion =
-    process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-11-30'
-
-export const dataset = assertValue(
-    process.env.NEXT_PUBLIC_SANITY_DATASET,
-    'Missing environment variable: NEXT_PUBLIC_SANITY_DATASET'
-)
-
-export const projectId = assertValue(
-    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-    'Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID'
-)
-
-function assertValue<T>(v: T | undefined, errorMessage: string): T {
-    if (v === undefined) {
-        throw new Error(errorMessage)
-    }
-    return v
-}
-</file>
-
-<file path="web/src/sanity/lib/client.ts">
-import { createClient } from 'next-sanity'
-
-import { apiVersion, dataset, projectId } from '../env'
-
-export const client = createClient({
-    projectId,
-    dataset,
-    apiVersion,
-    useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
-})
-</file>
-
-<file path="web/src/sanity/lib/image.ts">
-import { createImageUrlBuilder } from '@sanity/image-url'
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
-
-import { dataset, projectId } from '../env'
-
-// https://www.sanity.io/docs/image-url
-const builder = createImageUrlBuilder({ projectId, dataset })
-
-export const urlFor = (source: SanityImageSource) => {
-    return builder.image(source)
-}
-</file>
-
-<file path="web/src/sanity/schemaTypes/authorType.ts">
-import { UserIcon } from '@sanity/icons'
-import { defineField, defineType } from 'sanity'
-
-export const authorType = defineType({
-    name: 'author',
-    title: 'Author',
-    type: 'document',
-    icon: UserIcon,
-    fields: [
-        defineField({
-            name: 'name',
-            type: 'string',
-        }),
-        defineField({
-            name: 'slug',
-            type: 'slug',
-            options: {
-                source: 'name',
-            },
-        }),
-        defineField({
-            name: 'image',
-            type: 'image',
-            options: {
-                hotspot: true,
-            },
-        }),
-        defineField({
-            name: 'bio',
-            type: 'array',
-            of: [
-                {
-                    title: 'Block',
-                    type: 'block',
-                    styles: [{ title: 'Normal', value: 'normal' }],
-                    lists: [],
-                },
-            ],
-        }),
-    ],
-    preview: {
-        select: {
-            title: 'name',
-            media: 'image',
-        },
-    },
-})
-</file>
-
-<file path="web/src/sanity/schemaTypes/categoryType.ts">
-import { TagIcon } from '@sanity/icons'
-import { defineField, defineType } from 'sanity'
-
-export const categoryType = defineType({
-    name: 'category',
-    title: 'Category',
-    type: 'document',
-    icon: TagIcon,
-    fields: [
-        defineField({
-            name: 'title',
-            type: 'string',
-        }),
-        defineField({
-            name: 'slug',
-            type: 'slug',
-            options: {
-                source: 'title',
-            },
-        }),
-        defineField({
-            name: 'description',
-            type: 'text',
-        }),
-    ],
-})
-</file>
-
-<file path="web/src/sanity/schemaTypes/index.ts">
-import { type SchemaTypeDefinition } from 'sanity'
-
-import { authorType } from './authorType'
-import { categoryType } from './categoryType'
-import { linkType } from './linkType'
-import { postType } from './postType'
-
-export const schema: { types: SchemaTypeDefinition[] } = {
-    types: [authorType, categoryType, linkType, postType],
-}
-</file>
-
-<file path="web/src/sanity/schemaTypes/linkType.ts">
-import { LinkIcon } from '@sanity/icons'
-import { defineField, defineType } from 'sanity'
-
-export const linkType = defineType({
-    name: 'link',
-    title: 'Curated Link',
-    type: 'document',
-    icon: LinkIcon,
-    fields: [
-        defineField({
-            name: 'url',
-            title: 'URL',
-            type: 'url',
-            validation: (Rule) => Rule.required(),
-        }),
-        defineField({
-            name: 'title',
-            title: 'Title',
-            type: 'string',
-            description: 'Enter the title manually',
-        }),
-        defineField({
-            name: 'description',
-            title: 'Description',
-            type: 'text',
-            rows: 3,
-        }),
-        defineField({
-            name: 'image',
-            title: 'Cover Image',
-            type: 'image',
-            options: {
-                hotspot: true,
-            },
-        }),
-        defineField({
-            name: 'publishedAt',
-            title: 'Published At',
-            type: 'datetime',
-            initialValue: () => new Date().toISOString(),
-        }),
-    ],
-    preview: {
-        select: {
-            title: 'title',
-            subtitle: 'url',
-            media: 'image',
-        },
-    },
-})
-</file>
-
-<file path="web/src/sanity/schemaTypes/postType.ts">
-import { DocumentTextIcon } from '@sanity/icons'
-import { defineArrayMember, defineField, defineType } from 'sanity'
-
-export const postType = defineType({
-    name: 'post',
-    title: 'Post',
-    type: 'document',
-    icon: DocumentTextIcon,
-    fields: [
-        defineField({
-            name: 'title',
-            type: 'string',
-        }),
-        defineField({
-            name: 'slug',
-            type: 'slug',
-            options: {
-                source: 'title',
-            },
-        }),
-        defineField({
-            name: 'author',
-            type: 'reference',
-            to: { type: 'author' },
-        }),
-        defineField({
-            name: 'mainImage',
-            type: 'image',
-            options: {
-                hotspot: true,
-            },
-            fields: [
-                defineField({
-                    name: 'alt',
-                    type: 'string',
-                    title: 'Alternative text',
-                })
-            ]
-        }),
-        defineField({
-            name: 'categories',
-            type: 'array',
-            of: [defineArrayMember({ type: 'reference', to: { type: 'category' } })],
-        }),
-        defineField({
-            name: 'publishedAt',
-            type: 'datetime',
-        }),
-        defineField({
-            name: 'body',
-            type: 'array',
-            of: [defineArrayMember({ type: 'block' })],
-        }),
-    ],
-    preview: {
-        select: {
-            title: 'title',
-            author: 'author.name',
-            media: 'mainImage',
-        },
-        prepare(selection) {
-            const { author } = selection
-            return { ...selection, subtitle: author && `by ${author}` }
-        },
-    },
-})
-</file>
-
-<file path="web/src/sanity/structure.ts">
-import type { StructureResolver } from 'sanity/structure'
-
-// https://www.sanity.io/docs/structure-builder-cheat-sheet
-export const structure: StructureResolver = (S) =>
-    S.list()
-        .title('Content')
-        .items(S.documentTypeListItems())
-</file>
-
-<file path="web/tsconfig.json">
+<file path="tsconfig.json">
 {
   "compilerOptions": {
     "target": "ES2017",
@@ -1114,156 +2489,920 @@ export const structure: StructureResolver = (S) =>
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "web"]
 }
 </file>
 
-<file path="web/next.config.ts">
+<file path="next.config.ts">
 import type { NextConfig } from "next";
+import createMDX from '@next/mdx';
 
 const nextConfig: NextConfig = {
-  // 👇 이 부분이 핵심입니다!
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  // 👆 여기까지
-  
-  // 혹시 이미지 관련 설정이 있다면 남겨두세요. (없으면 무시)
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'cdn.sanity.io',
+        hostname: 'cdn.imweb.me',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
     ],
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  extension: /\.mdx?$/,
+});
+
+export default withMDX(nextConfig);
 </file>
 
-<file path="web/src/app/about/page.tsx">
-import { client } from '@/sanity/lib/client'
-import { defineQuery } from 'next-sanity'
-import { PortableText } from 'next-sanity'
-import Image from 'next/image'
-import { urlFor } from '@/sanity/lib/image'
-
-const ABOUT_PAGE_QUERY = defineQuery(`*[_type == "post" && slug.current == "about"][0] {
-  _id,
-  title,
-  body,
-  mainImage
-}`)
-
-export const revalidate = 60
-
-// Portable Text components for proper styling
-const portableTextComponents = {
-    block: {
-        h1: ({ children }: any) => (
-            <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-primary">{children}</h1>
-        ),
-        h2: ({ children }: any) => (
-            <h2 className="text-2xl md:text-3xl font-bold mt-10 mb-4 text-primary">{children}</h2>
-        ),
-        h3: ({ children }: any) => (
-            <h3 className="text-xl md:text-2xl font-semibold mt-8 mb-3 text-primary">{children}</h3>
-        ),
-        h4: ({ children }: any) => (
-            <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 text-primary">{children}</h4>
-        ),
-        normal: ({ children }: any) => (
-            <p className="mb-5 leading-relaxed text-foreground whitespace-pre-wrap">{children}</p>
-        ),
-    },
-    marks: {
-        strong: ({ children }: any) => <strong className="font-bold text-primary">{children}</strong>,
-        em: ({ children }: any) => <em className="italic">{children}</em>,
-        link: ({ value, children }: any) => (
-            <a
-                href={value?.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent hover:underline"
-            >
-                {children}
-            </a>
-        ),
-    },
-    list: {
-        bullet: ({ children }: any) => (
-            <ul className="list-disc list-inside mb-5 space-y-1 text-foreground">{children}</ul>
-        ),
-        number: ({ children }: any) => (
-            <ol className="list-decimal list-inside mb-5 space-y-1 text-foreground">{children}</ol>
-        ),
-    },
-    listItem: {
-        bullet: ({ children }: any) => (
-            <li className="mb-1">{children}</li>
-        ),
-        number: ({ children }: any) => (
-            <li className="mb-1">{children}</li>
-        ),
-    },
+<file path="package.json">
+{
+  "name": "powerhouse",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@keystatic/core": "^0.5.48",
+    "@keystatic/next": "^5.0.4",
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.0.10",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.555.0",
+    "next": "^16.0.10",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.5",
+    "tailwindcss": "^4",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^5"
+  }
 }
+</file>
 
-export default async function AboutPage() {
-    const page = await client.fetch(ABOUT_PAGE_QUERY)
+<file path="src/app/about/page.tsx">
+"use client";
 
-    if (!page) {
-        return (
-            <div className="py-24 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto">
-                <h1 className="text-4xl font-bold mb-8">About</h1>
-                <p className="text-lg text-secondary">페이지를 불러올 수 없습니다.</p>
-            </div>
-        )
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import { fadeInUp, staggerContainer, scaleIn } from "@/lib/animations";
+
+const HISTORY_ITEMS = [
+    {
+        year: "2024",
+        items: [
+            { date: "2024.2", text: "「청년에겐 정치가 필요하다」 토크콘서트" },
+            { date: "2024.2", text: "한국청년유권자연맹 전국지부 신년회 및 국회 청년미래특별위원회와의 만남" }
+        ]
+    },
+    {
+        year: "2023",
+        items: [
+            { date: "2023", text: "(연혁 데이터 추가 필요)" }
+        ]
+    },
+    {
+        year: "2015~2022",
+        items: [
+            { date: "2015~2022", text: "(연혁 데이터 추가 필요)" }
+        ]
+    },
+    {
+        year: "2010~2014",
+        items: [
+            { date: "2012.1.27", text: "청연정책연구원 창립 / 이사장 : 안광복(법무법인 대륙아주 고문) / 원장 : 최진우(한양대 교수)" },
+            { date: "2012.1.27", text: "(사)한국청년유권자연맹 창립 2주년 기념 및 청연정책연구원 창립 토론회 '벼랑 끝 북한의 29세 지도자, 어디로 갈 것인가? 청년의 눈으로 본 북한 김정은 체제 변화 예측' 토론회" },
+            { date: "2011.7.19", text: "제7회 청연토론회 \"북한인권법, 유권자의 선택은: 북한인권법을 둘러싼 쟁점과 전망\"" },
+            { date: "2011.7.19~8.27", text: "제10기 청년리더십프로그램(YLP 10기) 매주 화요일, 총 7주" },
+            { date: "2011.7.11~7.14", text: "2011국회인턴프로그램 기본교육 (활동기간 8월 ~ 11월 23일 수료)" },
+            { date: "2011.6.13", text: "제6회 청연토론회 양성평등한 국방의무 분담 방안 마련을 위한 토론회 \"국가를 지키는 일에 남녀가 유별하다?\"" },
+            { date: "2011.4.22", text: "제5회 청년토론회 \"SNS 전성시대, 대의민주주의의 새로운 대안이 될 것인가?\"" },
+            { date: "2011.3.24", text: "4회 비전콘서트 함께가요! 대한민국! - 천안함 희생장병 추모 \"우리는 친구들을 잊지 않겠습니다\"" },
+            { date: "2011.3.14", text: "비영리민간단체 등록 (서울특별시)" },
+            { date: "2011.3.18~5.6", text: "제2기 청연리더스클럽 (매주 금요일 8주간)" },
+            { date: "2011.1.22", text: "창립 1주년 기념행사 : 청연지부조직(강원, 대구, 인천) 및 전국대학생사업추진단(100개 대학교) 발대식" },
+            { date: "2011.1.13~2.24", text: "제9기 청년리더십프로그램(YLP 9기)" },
+            { date: "2010.12.15", text: "제4회 청연 토론회 - \"청년실업의 오늘과 그들의 목소리\"" },
+            { date: "2010.11.23", text: "제 3회 비전콘서트 - \"청년, 정치에 도전하다!\"" },
+            { date: "2010.10.13~11.17", text: "제1회 청연 리더스클럽" },
+            { date: "2010.10. 7", text: "제 3회 청연 토론회 - \"2030 청년세대에게 통일이란?\"" },
+            { date: "2010.8.24", text: "제2회 청연비전콘서트 - \"우리가 대한민국의 주인입니다!\"" },
+            { date: "2010.7.29", text: "비영리 사단법인 설립허가 (소관 : 행정안전부)" },
+            { date: "2010.7.22 ~ 8.26", text: "제8회 청년리더십프로그램(YLP)" },
+            { date: "2010.6.30", text: "제2회 청연토론회 『6.2 지방선거를 통해 본 2030 청년유권자의 정치세력화와 한국정치 전망』" },
+            { date: "2010.5.22", text: "제1회 청연토론회 『청년유권자의 눈으로 본 6.2 지방선거 서울시정책토론회』" },
+            { date: "2010.4.28", text: "제1회 청연비전콘서트 - '세상을 바꾸는 꿈'" },
+            { date: "2010.3.6", text: "제1회 청연 운영위원 전체회의" },
+            { date: "2010.1.27", text: "한국청년유권자연맹 창립식 / 초대 운영위원장 : 이연주(전 한국여성유권자연맹 회장)" }
+        ]
     }
+];
+
+function AnimatedSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
 
     return (
-        <article className="py-12 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto w-full flex flex-col gap-8">
-            {/* Header */}
-            <header className="flex flex-col gap-6 items-center">
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-primary leading-tight">
-                    {page.title}
-                </h1>
-            </header>
+        <motion.div
+            ref={ref}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            variants={staggerContainer}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
+}
 
-            {/* Main Image */}
-            {page.mainImage && (
-                <div className="relative w-full aspect-[16/9] rounded-sm overflow-hidden">
-                    <Image
-                        src={urlFor(page.mainImage).width(1200).height(675).url()}
-                        alt={page.mainImage.alt || page.title}
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                </div>
-            )}
+export default function AboutPage() {
+    return (
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
+            {/* Intro Section */}
+            <AnimatedSection className="text-center mb-24 space-y-8">
+                <motion.div variants={fadeInUp} className="space-y-4">
+                    <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+                        청연을<br />소개합니다!
+                    </h1>
+                    <div className="w-20 h-1 bg-primary mx-auto opacity-50" />
+                </motion.div>
+                <motion.p variants={fadeInUp} className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                    무한한 잠재력과 열정을 지닌 청년세대들이 스스로를 개척하고, 책임지는 참여를 통해<br className="hidden md:block" />
+                    사회변혁은 물론 미래를 창조하는 글로벌 인재로 성장할 수 있도록 하는데 그 목적을 두고 있습니다.
+                </motion.p>
+            </AnimatedSection>
 
-            {/* Content */}
-            {page.body && (
-                <div className="flex flex-col max-w-none">
-                    <PortableText value={page.body} components={portableTextComponents} />
+            {/* Mission Section */}
+            <AnimatedSection className="mb-32">
+                <motion.div variants={fadeInUp} className="bg-muted/30 rounded-3xl p-8 md:p-12 text-center">
+                    <h2 className="text-3xl font-bold mb-8">한국청년유권자연맹 (청연)은?</h2>
+                    <div className="space-y-8 text-lg">
+                        <p className="font-medium text-xl leading-relaxed">
+                            정치적 중립단체로서 <span className="text-primary">시민교육을 실시하는 학교</span>이자 <span className="text-primary">차세대 지도자를 육성</span>하는 인재 양성소,<br className="hidden md:block" />
+                            청년들의 권익을 대변하고 비전을 만들어 내는 역동적인 파워하우스의 기능을 담당합니다.
+                        </p>
+                        <motion.div
+                            variants={staggerContainer}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="grid md:grid-cols-3 gap-6 text-left"
+                        >
+                            {[
+                                { title: "첫째", desc: "유권자로서 권리와 의무를 올바르게 행사할 수 있도록 민주시민의 자질과 소양을 교육한다." },
+                                { title: "둘째", desc: "청년유권자의 권익을 대변하며, 한국사회의 통합과 민주발전을 위해 청년의 힘을 결집한다." },
+                                { title: "셋째", desc: "미래한국사회를 이끌어갈 차세대 지도자를 발굴, 육성하고 경쟁력 있는 네트워크를 만든다." }
+                            ].map((item, idx) => (
+                                <motion.div key={idx} variants={scaleIn}>
+                                    <Card className="bg-background border-none shadow-sm h-full hover:shadow-md transition-shadow">
+                                        <CardContent className="p-6">
+                                            <h3 className="font-bold text-lg mb-3 text-primary">{item.title}</h3>
+                                            <p className="text-muted-foreground">{item.desc}</p>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </div>
+                </motion.div>
+            </AnimatedSection>
+
+            {/* Representative Message */}
+            <AnimatedSection className="mb-32">
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12 text-center">대표 인사말</motion.h2>
+                <motion.div
+                    variants={fadeInUp}
+                    className="flex flex-col md:flex-row gap-12 items-start bg-card border rounded-2xl p-8 md:p-12 shadow-sm hover:shadow-lg transition-shadow"
+                >
+                    <div className="w-full md:w-1/3 aspect-[3/4] relative rounded-xl overflow-hidden bg-muted shrink-0">
+                        <Image
+                            src="https://cdn.imweb.me/thumbnail/20250101/placeholder.jpg"
+                            alt="정재욱 상임대표"
+                            fill
+                            className="object-cover"
+                            unoptimized
+                        />
+                    </div>
+                    <div className="flex-1 space-y-6">
+                        <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
+                            <p className="font-bold text-foreground text-2xl mb-6">
+                                "안녕하세요? <br />사단법인 한국청년유권자연맹 상임대표 정재욱입니다."
+                            </p>
+                            <p>
+                                한국청년유권자연맹을 찾아주신 여러분을 진심으로 환영합니다.
+                            </p>
+                            <p>
+                                한국청년유권자연맹은 2010년 창립 이래 <span className="font-bold text-foreground">책임있는 참여가 미래를 창조한다</span>는 가치를 중심으로, 대한민국의 청년들이 사회적 변화를 이끌어갈 리더로 성장할 수 있도록 힘써왔습니다.
+                            </p>
+                            <p>
+                                특히, 우리의 핵심 활동인 청년 리더십 교육은 청년들에게 책임감과 도전 정신을 심어주고, 미래 통일대한민국을 이끌어나갈 인재를 양성하는 데 기여하고 있습니다. 우리는 청년들이 단순한 정책 소비자가 아닌, 능동적인 미래 설계자로 자리 잡을 수 있도록 다양한 교육 프로그램과 사회 참여 기회를 제공하고 있습니다.
+                            </p>
+                            <p>
+                                그러나 이러한 여정은 청년들의 참여뿐만 아니라, 일반 시민 여러분의 후원과 지지가 없이는 이루어질 수 없습니다. 여러분의 관심과 응원은 대한민국의 미래 리더를 키우는 든든한 기반이자, 더 나은 사회를 만들어가는 데 없어서는 안 될 힘입니다.
+                            </p>
+                            <p>
+                                한국청년유권자연맹은 앞으로도 청년들과 시민들이 함께 소통하고 협력하며, 모두가 공존하는 더 나은 미래를 열어가기 위해 최선을 다하겠습니다.
+                            </p>
+                            <p>감사합니다.</p>
+                        </div>
+                    </div>
+                </motion.div>
+            </AnimatedSection>
+
+            {/* Major Projects */}
+            <AnimatedSection className="mb-32 text-center">
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12">주요 사업</motion.h2>
+                <motion.div
+                    variants={staggerContainer}
+                    className="grid md:grid-cols-3 gap-8"
+                >
+                    {[
+                        "청년정책 연구",
+                        "청년정치리더 육성",
+                        "전국 청년네트워크 강화"
+                    ].map((project, idx) => (
+                        <motion.div
+                            key={project}
+                            variants={scaleIn}
+                            whileHover={{ scale: 1.05, y: -5 }}
+                            className="flex items-center justify-center p-8 rounded-2xl bg-primary/5 border border-primary/10 aspect-video group hover:bg-primary/10 transition-colors cursor-default"
+                        >
+                            <h3 className="text-2xl font-bold text-primary">{project}</h3>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </AnimatedSection>
+
+            {/* CI Introduction */}
+            <AnimatedSection className="mb-32">
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12 text-center">CI 소개</motion.h2>
+                <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-8">
+                    {[
+                        { color: "bg-orange-500", shadow: "shadow-orange-500/20", title: "상징 : 태양", desc: "미래 한국의 에너지를 만들어내는 발전소\n(The Powerhouse of Future Korea)" },
+                        { color: "bg-teal-500", shadow: "shadow-teal-500/20", title: "색상 : 청록", desc: "파란색(가능성, 비전)과 초록색(희망, 도전) 혼합\n→ 청록색(미래에 대한 희망과 확신)" },
+                        { color: "bg-primary", shadow: "shadow-primary/20", title: "3Y", desc: "Liberty, Energy, Harmony\n청년의 자유로운 사고와 창의적인 에너지로 조화로운 국가발전에 이바지", label: "3Y" }
+                    ].map((item, idx) => (
+                        <motion.div
+                            key={idx}
+                            variants={scaleIn}
+                            whileHover={{ y: -5 }}
+                            className="space-y-4 p-8 bg-muted/30 rounded-2xl border border-border/50 text-center hover:bg-muted/50 transition-colors"
+                        >
+                            <div className={`w-12 h-12 ${item.color} rounded-full mx-auto mb-4 shadow-lg ${item.shadow} flex items-center justify-center text-white font-bold text-xs`}>
+                                {item.label || ""}
+                            </div>
+                            <h3 className="text-xl font-bold">{item.title}</h3>
+                            <p className="text-muted-foreground whitespace-pre-line">{item.desc}</p>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </AnimatedSection>
+
+            {/* History */}
+            <AnimatedSection>
+                <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-12 text-center">연혁</motion.h2>
+                <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-muted-foreground/20 before:to-transparent">
+                    {HISTORY_ITEMS.map((period, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.5, delay: idx * 0.1 }}
+                            className="relative flex items-start md:justify-normal md:odd:flex-row-reverse group"
+                        >
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-background bg-muted shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 mt-1">
+                                <div className="w-3 h-3 bg-primary rounded-full" />
+                            </div>
+                            <div className="w-[calc(100%-4rem)] ml-6 md:ml-0 md:w-[calc(50%-2.5rem)] p-6 bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+                                <div className="font-bold text-2xl mb-6 text-primary border-b pb-2">{period.year}</div>
+                                <ul className="space-y-4">
+                                    {period.items.map((item, i) => (
+                                        <li key={i} className="text-sm text-muted-foreground flex gap-4">
+                                            <span className="font-bold text-foreground min-w-[120px] shrink-0">{item.date}</span>
+                                            <span className="flex-1">{item.text}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </motion.div>
+                    ))}
                 </div>
-            )}
-        </article>
-    )
+            </AnimatedSection>
+        </div>
+    );
 }
 </file>
 
-<file path="web/src/app/blog/[slug]/page.tsx">
-import { client } from "@/sanity/lib/client";
-import { POST_QUERY } from "@/sanity/lib/queries";
-import { urlFor } from "@/sanity/lib/image";
+<file path="src/app/activities/page.tsx">
+import { getActivityPosts } from "@/lib/keystatic";
+import { PostListPage } from "@/components/features/post-list-page";
+
+export const revalidate = 60;
+
+export default async function ActivitiesPage() {
+    const posts = await getActivityPosts();
+
+    return (
+        <PostListPage
+            title="청연 활동 소식"
+            subtitle={[
+                "한국청년유권자연맹의 최근 소식!",
+                "어떤 일이 있었을까요?"
+            ]}
+            emptyMessage="아직 등록된 활동이 없습니다."
+            posts={posts}
+        />
+    );
+}
+</file>
+
+<file path="src/app/join/page.tsx">
+"use client";
+
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import { fadeInUp, staggerContainer, scaleIn } from "@/lib/animations";
+import { Heart, Users, Sparkles, ArrowRight } from "lucide-react";
+
+function AnimatedSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+    return (
+        <motion.div
+            ref={ref}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            variants={staggerContainer}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
+}
+
+export default function JoinPage() {
+    return (
+        <div className="min-h-screen">
+            {/* Hero Section */}
+            <section className="relative py-32 overflow-hidden">
+                {/* Background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-violet-950" />
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl" />
+                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/30 rounded-full blur-3xl" />
+                </div>
+
+                <div className="container mx-auto px-4 max-w-6xl relative z-10">
+                    <AnimatedSection className="text-center">
+                        <motion.div variants={fadeInUp} className="space-y-6">
+                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-sm text-blue-300 backdrop-blur-sm">
+                                <Heart className="w-4 h-4" />
+                                함께 만드는 변화
+                            </span>
+                            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-white">
+                                청연과{" "}
+                                <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                                    함께하기
+                                </span>
+                            </h1>
+                            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                                청년이 참여하는 새로운 대한민국.<br />
+                                여러분의 참여가 미래를 만듭니다.
+                            </p>
+                        </motion.div>
+                        <motion.div variants={fadeInUp} className="pt-8">
+                            <Button size="lg" asChild className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white border-0 shadow-lg shadow-blue-500/25">
+                                <Link href="https://secure.donus.org/powerhouse/pay/step1" target="_blank" rel="noopener noreferrer">
+                                    회원가입 및 후원하기
+                                    <ArrowRight className="w-4 h-4 ml-2" />
+                                </Link>
+                            </Button>
+                        </motion.div>
+                    </AnimatedSection>
+                </div>
+            </section>
+
+            {/* Why Join Section */}
+            <section className="py-24 bg-background">
+                <div className="container mx-auto px-4 max-w-6xl">
+                    <AnimatedSection className="text-center mb-16">
+                        <motion.h2 variants={fadeInUp} className="text-3xl font-bold mb-4">
+                            왜 청연과 함께해야 할까요?
+                        </motion.h2>
+                        <motion.p variants={fadeInUp} className="text-muted-foreground text-lg">
+                            청연과 함께하는 것은 단순한 가입이 아닌, 대한민국의 미래를 설계하는 일입니다.
+                        </motion.p>
+                    </AnimatedSection>
+
+                    <motion.div
+                        variants={staggerContainer}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="grid md:grid-cols-3 gap-8"
+                    >
+                        {[
+                            {
+                                icon: Users,
+                                title: "청년 네트워크",
+                                desc: "전국의 열정적인 청년들과 연결되어 함께 성장하고 배울 수 있습니다."
+                            },
+                            {
+                                icon: Sparkles,
+                                title: "리더십 교육",
+                                desc: "차세대 리더로 성장할 수 있는 다양한 교육 프로그램에 참여할 수 있습니다."
+                            },
+                            {
+                                icon: Heart,
+                                title: "사회 변화",
+                                desc: "청년의 목소리를 정책에 반영하고 실질적인 사회 변화를 만들어갑니다."
+                            }
+                        ].map((item, idx) => (
+                            <motion.div
+                                key={idx}
+                                variants={scaleIn}
+                                whileHover={{ y: -5 }}
+                                className="p-8 rounded-2xl bg-card border border-border/50 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                                    <item.icon className="w-8 h-8 text-primary" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                                <p className="text-muted-foreground">{item.desc}</p>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* About Section */}
+            <section className="py-24 bg-muted/30">
+                <div className="container mx-auto px-4 max-w-4xl">
+                    <AnimatedSection className="space-y-8">
+                        <motion.h2 variants={fadeInUp} className="text-3xl font-bold text-center mb-12">
+                            회원가입 및 후원 안내
+                        </motion.h2>
+
+                        <motion.div variants={fadeInUp} className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+                            <p>
+                                지금 대한민국은 정치적 위기를 맞이하고 있습니다. 이러한 위기를 극복하고,
+                                우리나라의 미래를 책임질 정치 리더를 발굴하고 육성하는 일은 모두가 함께 해결해야 할 가장 중요한 과제입니다.
+                            </p>
+                            <p>
+                                사단법인 한국청년유권자연맹은 2010년 1월 27일 창립 이후, 민주시민교육을 통해 청년들의 의식을 깨우고,
+                                차세대 지도자를 양성하는 데 앞장서 왔습니다. 우리는 청년들의 목소리가 사회 전반에 반영되고,
+                                이들이 정치적 역량을 갖춘 미래의 주역으로 성장하도록 돕고 있습니다.
+                            </p>
+                            <p className="font-medium text-foreground">
+                                여러분의 후원과 참여는 단순한 기여를 넘어, 우리 사회의 미래를 설계하는 일입니다.
+                                이는 청년들에게 더 나은 교육과 기회를 제공하며, 한국 정치의 지속 가능한 발전을 이루는 밑거름이 됩니다.
+                            </p>
+                        </motion.div>
+
+                        <motion.div
+                            variants={fadeInUp}
+                            className="bg-card p-8 rounded-2xl border shadow-sm mt-12"
+                        >
+                            <h3 className="text-xl font-bold mb-6">후원 안내</h3>
+                            <p className="text-muted-foreground mb-6">
+                                후원 계좌 및 자세한 문의는 아래 연락처로 부탁드립니다.
+                            </p>
+                            <ul className="space-y-3 text-muted-foreground">
+                                <li className="flex items-center gap-3">
+                                    <span className="w-20 font-medium text-foreground">전화</span>
+                                    <span>02-000-0000</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="w-20 font-medium text-foreground">이메일</span>
+                                    <span>contact@powerhousekorea.com</span>
+                                </li>
+                            </ul>
+                        </motion.div>
+                    </AnimatedSection>
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="py-24 bg-background">
+                <div className="container mx-auto px-4 max-w-4xl">
+                    <AnimatedSection className="text-center">
+                        <motion.div variants={fadeInUp} className="space-y-6">
+                            <h2 className="text-3xl font-bold">
+                                지금 바로 시작하세요
+                            </h2>
+                            <p className="text-muted-foreground text-lg">
+                                청년 정치에 조금이라도 관심 있다면 누구나 참여할 수 있습니다.
+                            </p>
+                            <div className="pt-4">
+                                <Button size="lg" asChild>
+                                    <Link href="https://secure.donus.org/powerhouse/pay/step1" target="_blank" rel="noopener noreferrer">
+                                        한국청년유권자연맹 함께하기
+                                        <ArrowRight className="w-4 h-4 ml-2" />
+                                    </Link>
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </AnimatedSection>
+                </div>
+            </section>
+        </div>
+    );
+}
+</file>
+
+<file path="src/app/news/page.tsx">
+import { getNewsPosts } from "@/lib/keystatic";
+import { PostListPage } from "@/components/features/post-list-page";
+
+export const revalidate = 60;
+
+export default async function NewsPage() {
+    const posts = await getNewsPosts();
+
+    return (
+        <PostListPage
+            title="청연 NEWS"
+            subtitle={[
+                "뉴스에 등장한 청연 소식!",
+                "어떤 활동이 있었는지 확인해 보세요!"
+            ]}
+            emptyMessage="아직 등록된 게시물이 없습니다."
+            posts={posts}
+        />
+    );
+}
+</file>
+
+<file path="src/components/features/hero-section.tsx">
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import { heroTextVariants, staggerContainer, fadeIn } from "@/lib/animations";
+
+export function HeroSection() {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const scrollToContent = () => {
+        window.scrollTo({
+            top: window.innerHeight,
+            behavior: "smooth",
+        });
+    };
+
+    return (
+        <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+            {/* Gradient Background */}
+            <div className="absolute inset-0 -z-10">
+                {/* Base gradient - Dark blue to purple */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-violet-950" />
+
+                {/* Animated gradient orbs */}
+                {mounted && (
+                    <>
+                        <motion.div
+                            className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-blue-500/20 blur-[120px]"
+                            animate={{
+                                x: [0, 50, 0],
+                                y: [0, 30, 0],
+                                scale: [1, 1.1, 1],
+                            }}
+                            transition={{
+                                duration: 8,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                            }}
+                        />
+                        <motion.div
+                            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-violet-500/20 blur-[100px]"
+                            animate={{
+                                x: [0, -40, 0],
+                                y: [0, -50, 0],
+                                scale: [1, 1.15, 1],
+                            }}
+                            transition={{
+                                duration: 10,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                            }}
+                        />
+                        <motion.div
+                            className="absolute top-1/2 right-1/3 w-[400px] h-[400px] rounded-full bg-cyan-500/10 blur-[80px]"
+                            animate={{
+                                x: [0, 30, 0],
+                                y: [0, -30, 0],
+                            }}
+                            transition={{
+                                duration: 7,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                            }}
+                        />
+                    </>
+                )}
+
+                {/* Grid pattern overlay */}
+                <div
+                    className="absolute inset-0 opacity-[0.03]"
+                    style={{
+                        backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                                         linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+                        backgroundSize: '60px 60px',
+                    }}
+                />
+
+                {/* Top fade for header blend */}
+                <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-slate-950 to-transparent" />
+            </div>
+
+            {/* Main Content */}
+            <div className="container relative z-10 mx-auto px-4 text-center">
+                <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                    className="max-w-4xl mx-auto space-y-8"
+                >
+                    {/* Badge */}
+                    <motion.div variants={heroTextVariants}>
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-blue-300 backdrop-blur-sm">
+                            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                            2010년부터 청년과 함께
+                        </span>
+                    </motion.div>
+
+                    {/* Main Headline */}
+                    <motion.h1
+                        variants={heroTextVariants}
+                        className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl leading-[1.1]"
+                    >
+                        <span className="block">대한민국의</span>
+                        <span className="block bg-gradient-to-r from-blue-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
+                            새로운 미래
+                        </span>
+                        <span className="block text-white/90">청년이 만듭니다</span>
+                    </motion.h1>
+
+                    {/* Subtitle */}
+                    <motion.p
+                        variants={heroTextVariants}
+                        className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed"
+                    >
+                        책임지는 참여로 사회를 변화시키고,
+                        <br className="hidden sm:block" />
+                        미래를 창조하는 글로벌 청년 리더를 양성합니다.
+                    </motion.p>
+
+                    {/* CTA Buttons */}
+                    <motion.div
+                        variants={heroTextVariants}
+                        className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
+                    >
+                        <motion.a
+                            href="/join"
+                            className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 text-white font-semibold text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_40px_rgba(99,102,241,0.4)]"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <span className="relative z-10">함께하기</span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </motion.a>
+                        <motion.a
+                            href="/about"
+                            className="px-8 py-4 rounded-full border border-white/20 text-white font-semibold text-lg hover:bg-white/5 transition-all duration-300"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            청연 알아보기
+                        </motion.a>
+                    </motion.div>
+                </motion.div>
+            </div>
+
+            {/* Floating particles */}
+            {mounted && (
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {[...Array(30)].map((_, i) => (
+                        <motion.div
+                            key={i}
+                            className="absolute w-1 h-1 rounded-full bg-white/30"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 100}%`,
+                            }}
+                            animate={{
+                                y: [0, -100 - Math.random() * 100],
+                                opacity: [0, 0.8, 0],
+                            }}
+                            transition={{
+                                duration: 4 + Math.random() * 4,
+                                repeat: Infinity,
+                                delay: Math.random() * 4,
+                                ease: "easeOut",
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* Scroll indicator */}
+            <motion.button
+                variants={fadeIn}
+                initial="hidden"
+                animate="visible"
+                onClick={scrollToContent}
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50 hover:text-white/80 transition-colors cursor-pointer"
+            >
+                <span className="text-sm font-medium">스크롤</span>
+                <motion.div
+                    animate={{
+                        y: [0, 8, 0],
+                    }}
+                    transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                    }}
+                >
+                    <ChevronDown className="w-6 h-6" />
+                </motion.div>
+            </motion.button>
+        </section>
+    );
+}
+</file>
+
+<file path="src/components/features/post-card.tsx">
+"use client";
+
+import Link from "next/link";
 import Image from "next/image";
-import { PortableText } from "next-sanity";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import { ArrowUpRight } from "lucide-react";
+import type { Post } from "@/types/post";
+
+interface PostCardProps {
+    post: Post;
+    index?: number;
+}
+
+interface CardContentProps {
+    post: Post;
+    showArrowIndicator?: boolean;
+}
+
+function CardContent({ post, showArrowIndicator = false }: CardContentProps) {
+    return (
+        <>
+            {/* Image Container */}
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+                {post.mainImage ? (
+                    <>
+                        <Image
+                            src={post.mainImage}
+                            alt={post.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        {/* Gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        {/* Arrow indicator - only shown in animated version */}
+                        {showArrowIndicator && (
+                            <div className="absolute bottom-4 right-4 p-2 rounded-full bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                                <ArrowUpRight className="w-5 h-5 text-white" />
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="flex h-full items-center justify-center text-muted-foreground bg-gradient-to-br from-muted to-muted/50">
+                        <span className="text-4xl opacity-30">📝</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Content */}
+            <div className="p-5">
+                {/* Meta info */}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+                    {post.categories?.map((cat) => (
+                        <span
+                            key={cat}
+                            className="px-2 py-1 rounded-full bg-primary/10 text-primary font-medium uppercase tracking-wider text-[10px]"
+                        >
+                            {cat}
+                        </span>
+                    ))}
+                    {post.publishedAt && (
+                        <time dateTime={post.publishedAt} className="text-muted-foreground/70">
+                            {format(new Date(post.publishedAt), "yyyy.MM.dd", { locale: ko })}
+                        </time>
+                    )}
+                </div>
+
+                {/* Title */}
+                <h3 className="text-lg font-bold leading-snug mb-2 group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                    {post.title}
+                </h3>
+
+                {/* Summary */}
+                {post.summary && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                        {post.summary}
+                    </p>
+                )}
+            </div>
+        </>
+    );
+}
+
+export function PostCard({ post, index = 0 }: PostCardProps) {
+    const basePath = post.categories?.includes('activity') ? '/activities' : '/news';
+
+    return (
+        <motion.article
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{
+                duration: 0.5,
+                delay: index * 0.1,
+                ease: [0.25, 0.1, 0.25, 1],
+            }}
+        >
+            <Link href={`${basePath}/${post.slug}`} className="group block h-full">
+                <motion.div
+                    className="h-full overflow-hidden rounded-2xl bg-card border border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
+                    whileHover={{ y: -5, scale: 1.01 }}
+                    transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                >
+                    <CardContent post={post} showArrowIndicator />
+                </motion.div>
+            </Link>
+        </motion.article>
+    );
+}
+
+// Non-animated version for server components
+export function PostCardStatic({ post }: { post: Post }) {
+    const basePath = post.categories?.includes('activity') ? '/activities' : '/news';
+
+    return (
+        <article>
+            <Link href={`${basePath}/${post.slug}`} className="group block h-full">
+                <div className="h-full overflow-hidden rounded-2xl bg-card border border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
+                    <CardContent post={post} />
+                </div>
+            </Link>
+        </article>
+    );
+}
+</file>
+
+<file path="src/app/news/[slug]/page.tsx">
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { PostDetail } from "@/components/features/post-detail";
+import { getPostDetail, generatePostStaticParams, generatePostMetadata } from "@/lib/post-utils";
 
 export const revalidate = 60;
 
@@ -1271,381 +3410,65 @@ interface PageProps {
     params: Promise<{ slug: string }>;
 }
 
-// Portable Text components for proper styling
-const portableTextComponents = {
-    block: {
-        h1: ({ children }: any) => (
-            <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-primary">{children}</h1>
-        ),
-        h2: ({ children }: any) => (
-            <h2 className="text-2xl md:text-3xl font-bold mt-10 mb-4 text-primary">{children}</h2>
-        ),
-        h3: ({ children }: any) => (
-            <h3 className="text-xl md:text-2xl font-semibold mt-8 mb-3 text-primary">{children}</h3>
-        ),
-        h4: ({ children }: any) => (
-            <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 text-primary">{children}</h4>
-        ),
-        normal: ({ children }: any) => (
-            <p className="mb-5 leading-relaxed text-foreground whitespace-pre-wrap">{children}</p>
-        ),
-    },
-    marks: {
-        strong: ({ children }: any) => <strong className="font-bold text-primary">{children}</strong>,
-        em: ({ children }: any) => <em className="italic">{children}</em>,
-        link: ({ value, children }: any) => (
-            <a
-                href={value?.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent hover:underline"
-            >
-                {children}
-            </a>
-        ),
-    },
-    list: {
-        bullet: ({ children }: any) => (
-            <ul className="list-disc list-inside mb-5 space-y-1 text-foreground">{children}</ul>
-        ),
-        number: ({ children }: any) => (
-            <ol className="list-decimal list-inside mb-5 space-y-1 text-foreground">{children}</ol>
-        ),
-    },
-    listItem: {
-        bullet: ({ children }: any) => (
-            <li className="mb-1">{children}</li>
-        ),
-        number: ({ children }: any) => (
-            <li className="mb-1">{children}</li>
-        ),
-    },
+export async function generateStaticParams() {
+    return generatePostStaticParams("news");
 }
 
-export default async function BlogPostPage({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const post = await client.fetch(POST_QUERY, { slug });
+    return generatePostMetadata(slug, "news");
+}
 
-    if (!post) {
+export default async function NewsDetailPage({ params }: PageProps) {
+    const { slug } = await params;
+    const result = await getPostDetail(slug);
+
+    if (!result) {
         notFound();
     }
 
-    return (
-        <article className="py-12 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto w-full flex flex-col gap-8">
-            {/* Header */}
-            <header className="flex flex-col gap-6 text-center items-center">
-                <div className="flex items-center gap-2 text-sm font-medium text-secondary uppercase tracking-wider">
-                    {post.categories?.[0]?.title || 'Blog'} • {new Date(post.publishedAt).toLocaleDateString()}
-                </div>
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-primary leading-tight">
-                    {post.title}
-                </h1>
-                {post.author && (
-                    <div className="flex items-center gap-3 mt-2">
-                        {post.author.image && (
-                            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100">
-                                <Image
-                                    src={urlFor(post.author.image).width(100).height(100).url()}
-                                    alt={post.author.name}
-                                    fill
-                                    className="object-cover"
-                                />
-                            </div>
-                        )}
-                        <div className="text-left">
-                            <p className="text-sm font-semibold text-primary">{post.author.name}</p>
-                        </div>
-                    </div>
-                )}
-            </header>
-
-            {/* Main Image */}
-            {post.mainImage && (
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-gray-100 my-4">
-                    <Image
-                        src={urlFor(post.mainImage).width(1200).height(675).url()}
-                        alt={post.mainImage.alt || post.title}
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                </div>
-            )}
-
-            {/* Content */}
-            <div className="flex flex-col max-w-none">
-                {post.body ? <PortableText value={post.body} components={portableTextComponents} /> : <p className="text-gray-500 italic">No content...</p>}
-            </div>
-        </article>
-    );
+    const { post, Content } = result;
+    return <PostDetail post={post} type="news" content={<Content />} />;
 }
 </file>
 
-<file path="web/src/sanity/lib/queries.ts">
-import { defineQuery } from "next-sanity";
+<file path="src/app/page.tsx">
+import { HeroSection } from "@/components/features/hero-section";
+import { ImpactSection } from "@/components/features/impact-section";
+import { CTASection } from "@/components/features/cta-section";
+import { ActivitiesSection } from "@/components/features/activities-section";
+import { NewsSection } from "@/components/features/news-section";
+import { getActivityPosts, getLatestNews } from "@/lib/keystatic";
 
-// Get all posts (excluding About page)
-export const POSTS_QUERY = defineQuery(`*[_type == "post" && defined(slug.current) && slug.current != "about"] | order(publishedAt desc) {
-  _id,
-  title,
-  slug,
-  publishedAt,
-  mainImage,
-  categories[]->{title}
-}`);
-
-// Get latest 3 posts (excluding About page)
-export const LATEST_POSTS_QUERY = defineQuery(`*[_type == "post" && defined(slug.current) && slug.current != "about"] | order(publishedAt desc)[0...3] {
-  _id,
-  title,
-  slug,
-  publishedAt,
-  mainImage,
-  categories[]->{title}
-}`);
-
-export const POST_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0] {
-  _id,
-  title,
-  slug,
-  publishedAt,
-  mainImage,
-  body,
-  author->{name, image, bio},
-  categories[]->{title}
-}`);
-
-export const LINKS_QUERY = defineQuery(`*[_type == "link"] | order(publishedAt desc) {
-  _id,
-  url,
-  title,
-  description,
-  image,
-  publishedAt
-}`);
-
-export const LATEST_LINKS_QUERY = defineQuery(`*[_type == "link"] | order(publishedAt desc)[0...4] {
-  _id,
-  url,
-  title,
-  description,
-  image,
-  publishedAt
-}`);
-
-export const CATEGORIES_QUERY = defineQuery(`*[_type == "category"] | order(title asc) {
-  _id,
-  title,
-  slug
-}`);
-</file>
-
-<file path="web/migration/migrate.ts">
-import { createClient } from '@sanity/client'
-import { JSDOM } from 'jsdom'
-import { htmlToBlocks } from '@sanity/block-tools'
-import { Schema } from '@sanity/schema'
-import fs from 'fs'
-import path from 'path'
-import dotenv from 'dotenv'
-
-// Load environment variables
-dotenv.config({ path: path.join(process.cwd(), '.env.local') })
-
-// Load Ghost Data
-const ghostDataPath = path.join(process.cwd(), 'migration', 'ghost.json')
-const ghostData = JSON.parse(fs.readFileSync(ghostDataPath, 'utf-8'))
-
-// Sanity Client
-const client = createClient({
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-    apiVersion: '2024-11-30',
-    useCdn: false,
-    token: process.env.SANITY_API_TOKEN!,
-})
-
-// Schema for block-tools
-const defaultSchema = Schema.compile({
-    name: 'default',
-    types: [
-        {
-            type: 'object',
-            name: 'blogPost',
-            fields: [
-                {
-                    title: 'Body',
-                    name: 'body',
-                    type: 'array',
-                    of: [{ type: 'block' }],
-                },
-            ],
-        },
-    ],
-})
-
-const blockContentType = defaultSchema
-    .get('blogPost')
-    .fields.find((field: any) => field.name === 'body').type
-
-// Helper to upload image
-async function uploadImage(url: string) {
-    try {
-        const response = await fetch(url)
-        if (!response.ok) throw new Error(`Failed to fetch: ${url}`)
-        const buffer = await response.arrayBuffer()
-        const asset = await client.assets.upload('image', Buffer.from(buffer), {
-            filename: path.basename(url),
-        })
-        return asset
-    } catch (error) {
-        console.error(`Error uploading ${url}:`, error)
-        return null
-    }
-}
-
-async function migrate() {
-    const posts = ghostData.db[0].data.posts
-    // Include both 'post' and 'page' types
-    const postsToMigrate = posts.filter(
-        (p: any) => (p.type === 'post' || p.type === 'page') && p.status === 'published'
-    )
-
-    console.log(`Found ${postsToMigrate.length} items to migrate.`)
-
-    for (const post of postsToMigrate) {
-        console.log(`Migrating: ${post.title} (${post.type})`)
-
-        // 1. Process Image
-        let mainImage = null
-        if (post.feature_image) {
-            const imageUrl = post.feature_image.replace(
-                '__GHOST_URL__',
-                'https://jaewook.ghost.io'
-            )
-            const asset = await uploadImage(imageUrl)
-            if (asset) {
-                mainImage = {
-                    _type: 'image',
-                    asset: {
-                        _type: 'reference',
-                        _ref: asset._id,
-                    },
-                }
-            }
-        }
-// 배포 트리거용 주석
-        // 2. Process HTML to Portable Text
-        let body: any[] = []
-        if (post.html) {
-            const html = post.html.replace(/__GHOST_URL__/g, 'https://jaewook.ghost.io')
-            try {
-                body = htmlToBlocks(html, blockContentType, {
-                    parseHtml: (html) => new JSDOM(html).window.document,
-                })
-            } catch (err) {
-                console.error(`Failed to convert HTML for ${post.title}:`, err)
-            }
-        }
-
-        // 3. Create Sanity Document
-        const doc = {
-            _type: 'post',
-            _id: `ghost-${post.id}`,
-            title: post.title,
-            slug: { _type: 'slug', current: post.slug },
-            publishedAt: new Date(post.published_at).toISOString(),
-            mainImage,
-            body,
-        }
-
-        try {
-            await client.createOrReplace(doc)
-            console.log(`✅ Created: ${post.title}`)
-        } catch (err) {
-            console.error(`❌ Failed: ${post.title}`, err)
-        }
-    }
-
-    console.log('\n🎉 Migration complete!')
-}
-
-migrate().catch(console.error)
-</file>
-
-<file path="web/src/app/globals.css">
-@import "tailwindcss";
-
-:root {
-  --background: #FAFAFA;
-  --foreground: #1A1A1A;
-  --primary: #2E2E2E;
-  --secondary: #6B6B6B;
-  --accent: #0066FF;
-  --muted: #F5F5F5;
-  --border: #E5E5E5;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-html {
-  overflow-y: scroll;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-}
-</file>
-
-<file path="web/src/app/page.tsx">
-import { client } from '@/sanity/lib/client'
-import { POSTS_QUERY, CATEGORIES_QUERY, LATEST_LINKS_QUERY } from '@/sanity/lib/queries'
-import { PostList } from '@/components/features/PostList'
-import { LinkCard } from '@/components/features/LinkCard'
-import Link from 'next/link'
-
-export const revalidate = 60
+export const revalidate = 60;
 
 export default async function Home() {
-    const posts = await client.fetch(POSTS_QUERY)
-    const categories = await client.fetch(CATEGORIES_QUERY)
-    const links = await client.fetch(LATEST_LINKS_QUERY)
+  const [activities, news] = await Promise.all([
+    getActivityPosts(),
+    getLatestNews(3),
+  ]);
 
-    return (
-        <main className="flex flex-col gap-24 py-12 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
-            {/* Latest Posts with Category Filter */}
-            <section className="flex flex-col gap-8">
-                <PostList posts={posts} categories={categories} />
-            </section>
+  const latestActivities = activities.slice(0, 6);
+  const latestNews = news;
 
-            {/* Media Section */}
-            <section className="flex flex-col gap-8">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-3xl font-bold text-foreground">MEDIA</h2>
-                    <Link href="/media" className="text-sm font-medium text-secondary hover:text-foreground transition-colors">
-                        전체 보기 →
-                    </Link>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {links.map((link: any) => (
-                        <LinkCard key={link._id} link={link} />
-                    ))}
-                </div>
-            </section>
-        </main>
-    )
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section - Full screen with gradient */}
+      <HeroSection />
+
+      {/* Impact Numbers Section */}
+      <ImpactSection />
+
+      {/* Activities Section */}
+      <ActivitiesSection posts={latestActivities} />
+
+      {/* CTA Section */}
+      <CTASection />
+
+      {/* News Section */}
+      <NewsSection posts={latestNews} />
+    </div>
+  );
 }
 </file>
 
